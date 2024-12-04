@@ -66,6 +66,13 @@ export const TableCellContainer = styled.div<CellProps>`
 		border-radius: ${props => props.isActive && '12px'};
 	}
 
+	&:first-of-type {
+		margin-left: 4px;
+	}
+	&:last-of-type {
+		margin-right: 4px;
+	}
+
 	&:not(:last-of-type)::after {
 		content: '';
 		width: 1px;
@@ -79,7 +86,7 @@ export const TableCellContainer = styled.div<CellProps>`
 
 export const TableHeadContainer = styled.div`
 	background: #f5f5f5;
-	border-radius: 12px;
+	border-radius: 8px;
 	width: fit-content;
 	/* background-color: #f3f4f8;
 	border-radius: 18px;

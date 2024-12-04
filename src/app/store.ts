@@ -2,14 +2,14 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
 
 import { userPath, userReducer } from '@/features/user/userSlice'
-// import { tablePath, tableReducer } from '@/features/table/tableSlice'
+import { tablePath, tableReducer } from '@/features/table/tableSlice'
 import { resetStoreListener } from './middlewares/resetStore'
 import { apiSlice } from './apiSlice'
 
 const rootReducer = combineReducers({
 	[apiSlice.reducerPath]: apiSlice.reducer,
 	[userPath]: userReducer,
-	// [tablePath]: tableReducer,
+	[tablePath]: tableReducer,
 })
 
 export const store = configureStore({

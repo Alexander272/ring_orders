@@ -6,7 +6,9 @@ import { Layout } from '@/components/Layout/Layout'
 import { NotFound } from '@/pages/notFound/NotFoundLazy'
 import { Home } from '@/pages/home/HomeLazy'
 import { Auth } from '@/pages/auth/AuthLazy'
-import PrivateRoute from './PrivateRoute'
+import { NewOrder } from '@/pages/new-order/NewOrderLazy'
+import { Order } from '@/pages/order/OrderLazy'
+// import PrivateRoute from './PrivateRoute'
 
 const config: RouteObject[] = [
 	{
@@ -19,11 +21,19 @@ const config: RouteObject[] = [
 			},
 			{
 				path: AppRoutes.Home,
-				element: <PrivateRoute />,
+				// element: <PrivateRoute />,
 				children: [
 					{
 						index: true,
 						element: <Home />,
+					},
+					{
+						path: AppRoutes.NewOrder,
+						element: <NewOrder />,
+					},
+					{
+						path: AppRoutes.Order,
+						element: <Order />,
 					},
 				],
 			},
