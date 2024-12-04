@@ -1,4 +1,4 @@
-import { IPosition } from './position'
+import { IPosition } from '@/features/position/types/position'
 
 export interface IOrder {
 	id: string
@@ -9,6 +9,8 @@ export interface IOrder {
 	closingDate: number
 	urgent: boolean
 	status: 'new' | 'processing' | 'closed'
+	notes: string
+	positions: IPosition[]
 }
 
 export interface IOrderDTO {
@@ -18,5 +20,6 @@ export interface IOrderDTO {
 	dateOfDispatch: number
 	// dateOfExecution: number
 	urgent: boolean
+	notes: string
 	positions: IPosition[]
 }

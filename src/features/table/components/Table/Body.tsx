@@ -2,7 +2,7 @@ import { FixedSizeList } from 'react-window'
 
 import { useAppSelector } from '@/hooks/redux'
 import { Fallback } from '@/components/Fallback/Fallback'
-import { NoRowsOverlay } from '@/components/NoRowsOverlay/components/NoRowsOverlay'
+import { NoRowsOverlay } from '@/components/NoRowsOverlay/NoRowsOverlay'
 import { TableBody } from '@/components/Table/TableBody'
 import { ColWidth, RowHeight, Size } from '../../constants/defaultValues'
 import { Columns } from '../../constants/columns'
@@ -26,6 +26,8 @@ export const Body = () => {
 				closingDate: 0,
 				urgent: false,
 				status: 'processing',
+				positions: [],
+				notes: '',
 			},
 			{
 				id: '2',
@@ -36,6 +38,8 @@ export const Body = () => {
 				closingDate: 0,
 				urgent: false,
 				status: 'processing',
+				positions: [],
+				notes: '',
 			},
 			{
 				id: '3',
@@ -46,6 +50,8 @@ export const Body = () => {
 				closingDate: 0,
 				urgent: true,
 				status: 'new',
+				positions: [],
+				notes: '',
 			},
 			{
 				id: '4',
@@ -56,6 +62,8 @@ export const Body = () => {
 				closingDate: 0,
 				urgent: false,
 				status: 'closed',
+				positions: [],
+				notes: '',
 			},
 		],
 		total: 5,

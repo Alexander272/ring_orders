@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { SxProps, Theme, Box } from '@mui/material'
 
-import StyledGridOverlay from '../StyledGridOverlay'
+import StyledGridOverlay from './StyledGridOverlay'
 
 import EmptyIcon from './EmptyIcon'
 

@@ -3,6 +3,8 @@ import { setupListeners } from '@reduxjs/toolkit/query'
 
 import { userPath, userReducer } from '@/features/user/userSlice'
 import { tablePath, tableReducer } from '@/features/table/tableSlice'
+import { positionPath, positionReducer } from '@/features/position/positionSlice'
+import { dialogPath, dialogReducer } from '@/features/dialog/dialogSlice'
 import { resetStoreListener } from './middlewares/resetStore'
 import { apiSlice } from './apiSlice'
 
@@ -10,6 +12,8 @@ const rootReducer = combineReducers({
 	[apiSlice.reducerPath]: apiSlice.reducer,
 	[userPath]: userReducer,
 	[tablePath]: tableReducer,
+	[positionPath]: positionReducer,
+	[dialogPath]: dialogReducer,
 })
 
 export const store = configureStore({

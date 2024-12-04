@@ -1,28 +1,28 @@
 import { useState } from 'react'
 import { Breadcrumbs, Button, FormControl, Stack, TextField, Typography } from '@mui/material'
+import { DatePicker } from '@mui/x-date-pickers'
 import { Column, DataSheetGrid, intColumn, keyColumn, textColumn } from 'react-datasheet-grid'
-import 'react-datasheet-grid/dist/style.css'
+import dayjs from 'dayjs'
 
-import type { IPositionDTO } from '../../types/position'
+import type { IPositionDTO } from '../../../position/types/position'
 import { AppRoutes } from '@/constants/routes'
+import { removeSpace } from '@/utils/format'
 import { Breadcrumb } from '@/components/Breadcrumb/Breadcrumb'
 import { ContextMenu } from '@/components/DataSheet/ContextMenu'
 import { AddRow } from '@/components/DataSheet/AddRow'
-import { DatePicker } from '@mui/x-date-pickers'
-import dayjs from 'dayjs'
 import { Checkbox } from '@/components/Checkbox/Checkbox'
 
 export const OrderForm = () => {
-	const [rows, setRows] = useState<IPositionDTO[]>([{ name: null, comment: null, count: null }])
+	const [rows, setRows] = useState<IPositionDTO[]>([{ name: null, comment: null, amount: null }])
 
-	const countPaste = (values: string[]) => {
-		return values.map(v => v.replace(/\s+/g, ''))
-	}
+	// const countPaste = (values: string[]) => {
+	// 	return values.map(v => v.replace(/\s+/g, ''))
+	// }
 
 	const columns: Column<IPositionDTO>[] = [
 		{ ...keyColumn<IPositionDTO, 'name'>('name', textColumn), title: 'Наименование' },
 		{ ...keyColumn<IPositionDTO, 'comment'>('comment', textColumn), title: 'Комментарий' },
-		{ ...keyColumn<IPositionDTO, 'count'>('count', intColumn), title: 'Изготовить', prePasteValues: countPaste },
+		{ ...keyColumn<IPositionDTO, 'amount'>('amount', intColumn), title: 'Изготовить', prePasteValues: removeSpace },
 	]
 
 	return (
@@ -31,6 +31,7 @@ export const OrderForm = () => {
 				<Typography fontSize={'1.4rem'} pl={0.5}>
 					Новый заказ
 				</Typography>
+
 				<Breadcrumbs aria-label='breadcrumb'>
 					<Breadcrumb to={AppRoutes.Home}>Главная</Breadcrumb>
 					<Breadcrumb to={AppRoutes.NewOrder} active>
