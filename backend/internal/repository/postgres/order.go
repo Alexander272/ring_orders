@@ -26,7 +26,7 @@ type Order interface {
 	Get(ctx context.Context, req *models.GetOrderDTO) ([]*models.Order, error)
 	GetById(ctx context.Context, id string) (*models.Order, error)
 	Create(ctx context.Context, dto *models.OrderDTO) error
-	// Update(ctx context.Context, order *models.OrderDTO) error
+	Update(ctx context.Context, order *models.OrderDTO) error
 	Delete(ctx context.Context, dto *models.DeleteOrderDTO) error
 }
 
@@ -120,7 +120,19 @@ func (r *OrderRepo) Create(ctx context.Context, dto *models.OrderDTO) error {
 	return nil
 }
 
-// func (r *OrderRepo) Update(ctx context.Context, dto *models.OrderDTO) error {
+func (r *OrderRepo) Update(ctx context.Context, dto *models.OrderDTO) error {
+	//TODO надо наверное как-то обновлять только часть полей
+	query := fmt.Sprintf(`UPDATE %s SET notes=:notes, date_of_dispatch=:date_of_dispatch, urgent=:urgent, 
+		status=:status, updated_at=now() WHERE id=:id`,
+		OrdersTable,
+	)
+
+	_, err := r.db.NamedExecContext(ctx, query, dto)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
 
 func (r *OrderRepo) Delete(ctx context.Context, dto *models.DeleteOrderDTO) error {
 	query := fmt.Sprintf(`DELETE FROM %s WHERE id=$1`, OrdersTable)
