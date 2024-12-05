@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Alexander272/ring_orders/backend/internal/config"
+	"github.com/Alexander272/ring_orders/backend/internal/migrate"
 	"github.com/Alexander272/ring_orders/backend/internal/repository"
 	"github.com/Alexander272/ring_orders/backend/internal/server"
 	"github.com/Alexander272/ring_orders/backend/internal/services"
@@ -34,8 +35,12 @@ func main() {
 	}
 	logger.NewLogger(logger.WithLevel(conf.LogLevel), logger.WithAddSource(conf.LogSource))
 
+	// if err := migrate.Migrate(&conf.Postgres); err != nil {
+	// 	log.Fatalf("failed to migrate: %s", err.Error())
+	// }
+
 	//* Dependencies
-	db, err := postgres.NewPostgresDB(postgres.Config{
+	db, err := postgres.NewPostgresDB(&postgres.Config{
 		Host:     conf.Postgres.Host,
 		Port:     conf.Postgres.Port,
 		Username: conf.Postgres.Username,
@@ -47,7 +52,11 @@ func main() {
 		log.Fatalf("failed to initialize db: %s", err.Error())
 	}
 
-	keycloak := auth.NewKeycloakClient(auth.Deps{
+	if err := migrate.Migrate(db.DB); err != nil {
+		log.Fatalf("failed to migrate: %s", err.Error())
+	}
+
+	keycloak := auth.NewKeycloakClient(&auth.Deps{
 		Url:       conf.Keycloak.Url,
 		ClientId:  conf.Keycloak.ClientId,
 		Realm:     conf.Keycloak.Realm,

@@ -9,7 +9,7 @@ type Config struct {
 	DB       int
 }
 
-func NewRedisClient(conf Config) (*redis.Client, error) {
+func NewRedisClient(conf *Config) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     conf.Host + ":" + conf.Port,
 		Password: conf.Password,

@@ -24,7 +24,7 @@ type Deps struct {
 	AdminPass string
 }
 
-func NewKeycloakClient(deps Deps) *KeycloakClient {
+func NewKeycloakClient(deps *Deps) *KeycloakClient {
 	client := gocloak.NewClient(deps.Url)
 
 	ctx := context.Background()
