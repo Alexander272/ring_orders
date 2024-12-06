@@ -22,6 +22,7 @@ func NewPositionRepo(db *sqlx.DB) *PositionRepo {
 type Position interface {
 	Get(ctx context.Context, req *models.GetPositionDTO) ([]*models.Position, error)
 	Create(ctx context.Context, dto *models.CreatePositionDTO) error
+	CreateSeveral(ctx context.Context, dto []*models.CreatePositionDTO) error
 	Update(ctx context.Context, dto *models.UpdatePositionDTO) error
 }
 
@@ -31,7 +32,7 @@ func (r *PositionRepo) Get(ctx context.Context, req *models.GetPositionDTO) ([]*
 		FROM %s 
 		LEFT JOIN LATERAL (SELECT SUM(amount) FROM %s WHERE position_id=positions.id) AS made ON true
 		LEFT JOIN LATERAL (SELECT SUM(amount) FROM %s WHERE position_id=positions.id) AS accepted ON true
-		WHERE order_id=$1`,
+		WHERE order_id=$1 ORDER BY is_done, is_accepted, is_deleted, count`,
 		PositionsTable, MadeTable, AcceptedTable,
 	)
 	data := []*models.Position{}
@@ -43,8 +44,22 @@ func (r *PositionRepo) Get(ctx context.Context, req *models.GetPositionDTO) ([]*
 }
 
 func (r *PositionRepo) Create(ctx context.Context, dto *models.CreatePositionDTO) error {
-	query := fmt.Sprintf(`INSERT INTO %s(id, name, note, amount) VALUES (:id, :name, :note, :amount)`, PositionsTable)
+	query := fmt.Sprintf(`INSERT INTO %s(id, order_id, name, note, amount) VALUES (:id, :order_id, :name, :note, :amount)`, PositionsTable)
 	dto.Id = uuid.NewString()
+
+	_, err := r.db.NamedExecContext(ctx, query, dto)
+	if err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *PositionRepo) CreateSeveral(ctx context.Context, dto []*models.CreatePositionDTO) error {
+	query := fmt.Sprintf(`INSERT INTO %s(id, order_id, name, note, amount) VALUES (:id, :order_id, :name, :note, :amount)`, PositionsTable)
+
+	for i := range dto {
+		dto[i].Id = uuid.NewString()
+	}
 
 	_, err := r.db.NamedExecContext(ctx, query, dto)
 	if err != nil {

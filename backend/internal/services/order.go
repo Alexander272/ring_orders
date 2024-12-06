@@ -9,17 +9,21 @@ import (
 )
 
 type OrderService struct {
-	repo repository.Order
+	repo     repository.Order
+	position Position
 }
 
-func NewOrderService(repo repository.Order) *OrderService {
-	return &OrderService{repo: repo}
+func NewOrderService(repo repository.Order, position Position) *OrderService {
+	return &OrderService{
+		repo:     repo,
+		position: position,
+	}
 }
 
 type Order interface {
 	Get(ctx context.Context, req *models.GetOrderDTO) ([]*models.Order, error)
 	GetById(ctx context.Context, id string) (*models.Order, error)
-	Create(ctx context.Context, dto *models.OrderDTO) error
+	Create(ctx context.Context, dto *models.CreateOrderDTO) error
 	Update(ctx context.Context, dto *models.OrderDTO) error
 	Delete(ctx context.Context, dto *models.DeleteOrderDTO) error
 }
@@ -40,9 +44,17 @@ func (s *OrderService) GetById(ctx context.Context, id string) (*models.Order, e
 	return data, nil
 }
 
-func (s *OrderService) Create(ctx context.Context, dto *models.OrderDTO) error {
+func (s *OrderService) Create(ctx context.Context, dto *models.CreateOrderDTO) error {
 	if err := s.repo.Create(ctx, dto); err != nil {
 		return fmt.Errorf("failed to create order. error: %w", err)
+	}
+
+	for i := range dto.Positions {
+		dto.Positions[i].OrderId = dto.Id
+	}
+
+	if err := s.position.CreateSeveral(ctx, dto.Positions); err != nil {
+		return err
 	}
 	return nil
 }

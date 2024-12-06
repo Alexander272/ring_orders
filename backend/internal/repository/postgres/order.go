@@ -25,7 +25,7 @@ func NewOrderRepo(db *sqlx.DB) *OrderRepo {
 type Order interface {
 	Get(ctx context.Context, req *models.GetOrderDTO) ([]*models.Order, error)
 	GetById(ctx context.Context, id string) (*models.Order, error)
-	Create(ctx context.Context, dto *models.OrderDTO) error
+	Create(ctx context.Context, dto *models.CreateOrderDTO) error
 	Update(ctx context.Context, order *models.OrderDTO) error
 	Delete(ctx context.Context, dto *models.DeleteOrderDTO) error
 }
@@ -78,8 +78,8 @@ func (r *OrderRepo) Get(ctx context.Context, req *models.GetOrderDTO) ([]*models
 
 	params = append(params, req.Page.Limit, req.Page.Offset)
 
-	query := fmt.Sprintf(`SELECT id, count, order_number, notes, date_of_issue, date_of_dispatch, closing_date, 
-		urgent, status, updated_at, created_at FROM %s %s %s LIMIT $%d OFFSET $%d`,
+	query := fmt.Sprintf(`SELECT id, count, order_number, notes, date_of_issue, date_of_dispatch, date_of_adoption, closing_date, 
+		urgent, status, updated_at, created_at, COUNT(*) OVER() as total_count FROM %s %s %s LIMIT $%d OFFSET $%d`,
 		OrdersTable, filter, order, count, count+1,
 	)
 	data := []*models.Order{}
@@ -91,7 +91,7 @@ func (r *OrderRepo) Get(ctx context.Context, req *models.GetOrderDTO) ([]*models
 }
 
 func (r *OrderRepo) GetById(ctx context.Context, id string) (*models.Order, error) {
-	query := fmt.Sprintf(`SELECT id, count, order_number, notes, date_of_issue, date_of_dispatch, closing_date, 
+	query := fmt.Sprintf(`SELECT id, count, order_number, notes, date_of_issue, date_of_dispatch, date_of_adoption, closing_date, 
 		urgent, status, updated_at, created_at FROM %s WHERE id=$1`,
 		OrdersTable,
 	)
@@ -106,9 +106,9 @@ func (r *OrderRepo) GetById(ctx context.Context, id string) (*models.Order, erro
 	return data, nil
 }
 
-func (r *OrderRepo) Create(ctx context.Context, dto *models.OrderDTO) error {
-	query := fmt.Sprintf(`INSERT INTO %s(order_number, notes, date_of_issue, date_of_dispatch, urgent, status) 
-		VALUES (:order_number, :notes, :date_of_issue, :date_of_dispatch, :urgent, :status)`,
+func (r *OrderRepo) Create(ctx context.Context, dto *models.CreateOrderDTO) error {
+	query := fmt.Sprintf(`INSERT INTO %s(id, order_number, notes, date_of_issue, date_of_dispatch, urgent, status) 
+		VALUES (:id, :order_number, :notes, :date_of_issue, :date_of_dispatch, :urgent, :status)`,
 		OrdersTable,
 	)
 	dto.Id = uuid.NewString()
@@ -122,8 +122,8 @@ func (r *OrderRepo) Create(ctx context.Context, dto *models.OrderDTO) error {
 
 func (r *OrderRepo) Update(ctx context.Context, dto *models.OrderDTO) error {
 	//TODO надо наверное как-то обновлять только часть полей
-	query := fmt.Sprintf(`UPDATE %s SET notes=:notes, date_of_dispatch=:date_of_dispatch, urgent=:urgent, 
-		status=:status, updated_at=now() WHERE id=:id`,
+	query := fmt.Sprintf(`UPDATE %s SET notes=:notes, date_of_dispatch=:date_of_dispatch, date_of_adoption=:date_of_adoption, 
+		urgent=:urgent, status=:status, updated_at=now() WHERE id=:id`,
 		OrdersTable,
 	)
 

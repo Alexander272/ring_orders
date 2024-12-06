@@ -23,10 +23,11 @@ type GetPositionDTO struct {
 }
 
 type CreatePositionDTO struct {
-	Id     string `json:"id" db:"id"`
-	Name   string `json:"name" db:"name"`
-	Note   string `json:"note" db:"note"`
-	Amount int    `json:"amount" db:"amount"`
+	Id      string `json:"id" db:"id"`
+	OrderId string `json:"orderId" db:"order_id"`
+	Name    string `json:"name" db:"name"`
+	Note    string `json:"note" db:"note"`
+	Amount  int    `json:"amount" db:"amount"`
 }
 
 type UpdatePositionDTO struct{}

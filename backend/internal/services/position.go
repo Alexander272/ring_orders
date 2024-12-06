@@ -19,6 +19,7 @@ func NewPositionService(repo repository.Position) *PositionService {
 type Position interface {
 	Get(ctx context.Context, req *models.GetPositionDTO) ([]*models.Position, error)
 	Create(ctx context.Context, dto *models.CreatePositionDTO) error
+	CreateSeveral(ctx context.Context, dto []*models.CreatePositionDTO) error
 	Update(ctx context.Context, dto *models.UpdatePositionDTO) error
 }
 
@@ -32,7 +33,14 @@ func (s *PositionService) Get(ctx context.Context, req *models.GetPositionDTO) (
 
 func (s *PositionService) Create(ctx context.Context, dto *models.CreatePositionDTO) error {
 	if err := s.repo.Create(ctx, dto); err != nil {
-		return fmt.Errorf("failed to create positions. error: %w", err)
+		return fmt.Errorf("failed to create position. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PositionService) CreateSeveral(ctx context.Context, dto []*models.CreatePositionDTO) error {
+	if err := s.repo.CreateSeveral(ctx, dto); err != nil {
+		return fmt.Errorf("failed to create several positions. error: %w", err)
 	}
 	return nil
 }

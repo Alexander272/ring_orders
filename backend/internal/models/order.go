@@ -9,11 +9,13 @@ type Order struct {
 	Notes          string    `json:"notes" db:"notes"`
 	DateOfIssue    int       `json:"dateOfIssue" db:"date_of_issue"`
 	DateOfDispatch int       `json:"dateOfDispatch" db:"date_of_dispatch"`
+	DateOfAdoption int       `json:"dateOfAdoption" db:"date_of_adoption"`
 	ClosingDate    int       `json:"closingDate" db:"closing_date"`
 	Urgent         bool      `json:"urgent" db:"urgent"`
 	Status         string    `json:"status" db:"status"`
 	UpdatedAt      time.Time `json:"updatedAt" db:"updated_at"`
 	CreatedAt      time.Time `json:"createdAt" db:"created_at"`
+	Total          int       `json:"-" db:"total_count"`
 }
 
 type GetOrderDTO struct {
@@ -22,16 +24,28 @@ type GetOrderDTO struct {
 	Filters []*Filter
 }
 
+type CreateOrderDTO struct {
+	Id             string               `json:"id" db:"id"`
+	OrderNumber    string               `json:"orderNumber" db:"order_number" binding:"required"`
+	Notes          string               `json:"notes" db:"notes"`
+	DateOfIssue    int                  `json:"dateOfIssue" db:"date_of_issue" binding:"required"`
+	DateOfDispatch int                  `json:"dateOfDispatch" db:"date_of_dispatch"`
+	Urgent         bool                 `json:"urgent" db:"urgent"`
+	Status         string               `json:"status" db:"status"`
+	Positions      []*CreatePositionDTO `json:"positions" binding:"required"`
+}
+
 type OrderDTO struct {
 	Id             string    `json:"id" db:"id"`
-	OrderNumber    string    `json:"orderNumber" binding:"required"`
-	Notes          string    `json:"notes"`
-	DateOfIssue    int       `json:"dateOfIssue" binding:"required"`
-	DateOfDispatch int       `json:"dateOfDispatch"`
-	ClosingDate    int       `json:"closingDate"`
-	Urgent         bool      `json:"urgent"`
-	Status         string    `json:"status"`
-	UpdatedAt      time.Time `json:"updatedAt"`
+	OrderNumber    string    `json:"orderNumber" db:"order_number" binding:"required"`
+	Notes          string    `json:"notes" db:"notes"`
+	DateOfIssue    int       `json:"dateOfIssue" db:"date_of_issue" binding:"required"`
+	DateOfDispatch int       `json:"dateOfDispatch" db:"date_of_dispatch"`
+	DateOfAdoption int       `json:"dateOfAdoption" db:"date_of_adoption"`
+	ClosingDate    int       `json:"closingDate" db:"closing_date"`
+	Urgent         bool      `json:"urgent" db:"urgent"`
+	Status         string    `json:"status" db:"status"`
+	UpdatedAt      time.Time `json:"updatedAt" db:"updated_at"`
 }
 
 type DeleteOrderDTO struct {

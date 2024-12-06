@@ -37,7 +37,7 @@ func NewServices(deps *Deps) *Services {
 	made := NewMadeService(deps.Repos.Made)
 	accepted := NewAcceptedService(deps.Repos.Accepted)
 	position := NewPositionService(deps.Repos.Position)
-	order := NewOrderService(deps.Repos.Order)
+	order := NewOrderService(deps.Repos.Order, position)
 
 	return &Services{
 		MenuItem:   menuItem,
