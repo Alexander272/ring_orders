@@ -4,6 +4,7 @@ import { Box, Stack, Typography } from '@mui/material'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
 import { Pagination } from '@/components/Pagination/Pagination'
 import { getTablePage, getTableSize, setPage } from '../tableSlice'
+import { useGetAllData } from '../hooks/query'
 import { Size } from './Size'
 
 export const Footer: FC = () => {
@@ -13,9 +14,7 @@ export const Footer: FC = () => {
 
 	const dispatch = useAppDispatch()
 
-	// const { data } = useGetAllData()
-	//TODO
-	const data = { data: [], total: 0 }
+	const { data } = useGetAllData()
 
 	const setPageHandler = (page: number) => {
 		dispatch(setPage(page))

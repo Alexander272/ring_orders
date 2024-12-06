@@ -18,7 +18,7 @@ export const PositionTable: FC<Props> = ({ orderId }) => {
 	return (
 		<Table>
 			<TableHead>
-				<TableRow width={Columns.reduce((acc, c) => acc + (c?.width || 0), 0)} height={RowHeight}>
+				<TableRow width={Columns.reduce((acc, c) => acc + (c?.width || 0), 14)} height={RowHeight}>
 					{Columns.map(c => (
 						<TableCell key={c.key} width={c.width}>
 							<CellText value={c.label} />

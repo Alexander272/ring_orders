@@ -16,7 +16,7 @@ export const MadeForm = () => {
 			positionId: p.id,
 			count: p.count,
 			name: p.name,
-			remainder: p.amount - p.done,
+			remainder: p.amount - p.made,
 			amount: null,
 		}))
 	)

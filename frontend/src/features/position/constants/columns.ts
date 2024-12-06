@@ -25,7 +25,7 @@ export const Columns: IColumn[] = [
 		formatter: value => numberFormat(value as number),
 	},
 	{
-		key: 'done',
+		key: 'made',
 		label: Titles.Done,
 		width: 170,
 		formatter: value => numberFormat(value as number),

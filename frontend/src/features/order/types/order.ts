@@ -1,4 +1,6 @@
-import { IPosition } from '@/features/position/types/position'
+import { IPositionDTO } from '@/features/position/types/position'
+
+export type Status = 'new' | 'processing' | 'closed'
 
 export interface IOrder {
 	id: string
@@ -6,20 +8,23 @@ export interface IOrder {
 	orderNumber: string
 	dateOfIssue: number
 	dateOfDispatch: number
+	dateOfAdoption: number
 	closingDate: number
 	urgent: boolean
-	status: 'new' | 'processing' | 'closed'
+	status: Status
 	notes: string
-	positions: IPosition[]
+	// positions: IPosition[]
 }
 
 export interface IOrderDTO {
-	id: string
+	id?: string
 	orderNumber: string
 	dateOfIssue: number
 	dateOfDispatch: number
+	dateOfAdoption?: number
 	// dateOfExecution: number
 	urgent: boolean
 	notes: string
-	positions: IPosition[]
+	status: Status
+	positions?: IPositionDTO[]
 }

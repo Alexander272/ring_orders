@@ -2,9 +2,9 @@ export interface IPosition {
 	id: string
 	count: number
 	name: string
-	comment: string
+	note: string
 	amount: number
-	done: number
+	made: number
 	accepted: number
 	// status: string
 	isDeleted?: boolean
@@ -15,6 +15,6 @@ export interface IPosition {
 
 export interface IPositionDTO {
 	name: string | null
-	comment: string | null
+	note: string | null
 	amount: number | null
 }

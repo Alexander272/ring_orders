@@ -1,4 +1,4 @@
-import { ChangeEvent, FC } from 'react'
+import { ChangeEvent, FC, forwardRef, Ref } from 'react'
 import { Field, Input, Label, Svg } from './checkbox.style'
 
 type Props = {
@@ -9,17 +9,10 @@ type Props = {
 	onChange?: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
-export const Checkbox: FC<Props & React.InputHTMLAttributes<HTMLInputElement>> = ({
-	label,
-	id,
-	name,
-	value,
-	onChange,
-	...attr
-}) => {
+export const Checkbox: FC<Props> = forwardRef(({ label, id, name, value, onChange }, ref: Ref<HTMLInputElement>) => {
 	return (
 		<Field>
-			<Input id={id} name={name} checked={value} onChange={onChange} type='checkbox' {...attr} />
+			<Input ref={ref} id={id} name={name} checked={value} onChange={onChange} type='checkbox' />
 
 			<Label htmlFor={id}>
 				<span>
@@ -31,4 +24,4 @@ export const Checkbox: FC<Props & React.InputHTMLAttributes<HTMLInputElement>> =
 			</Label>
 		</Field>
 	)
-}
+})
