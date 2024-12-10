@@ -21,6 +21,7 @@ type Position interface {
 	Create(ctx context.Context, dto *models.CreatePositionDTO) error
 	CreateSeveral(ctx context.Context, dto []*models.CreatePositionDTO) error
 	Update(ctx context.Context, dto *models.UpdatePositionDTO) error
+	UpdateSeveral(ctx context.Context, dto []*models.UpdatePositionDTO) error
 }
 
 func (s *PositionService) Get(ctx context.Context, req *models.GetPositionDTO) ([]*models.Position, error) {
@@ -48,6 +49,13 @@ func (s *PositionService) CreateSeveral(ctx context.Context, dto []*models.Creat
 func (s *PositionService) Update(ctx context.Context, dto *models.UpdatePositionDTO) error {
 	if err := s.repo.Update(ctx, dto); err != nil {
 		return fmt.Errorf("failed to update positions. error: %w", err)
+	}
+	return nil
+}
+
+func (s *PositionService) UpdateSeveral(ctx context.Context, dto []*models.UpdatePositionDTO) error {
+	if err := s.repo.UpdateSeveral(ctx, dto); err != nil {
+		return fmt.Errorf("failed to update several positions. error: %w", err)
 	}
 	return nil
 }

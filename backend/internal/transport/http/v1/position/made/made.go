@@ -69,7 +69,7 @@ func (h *Handler) create(c *gin.Context) {
 	logger.Info("Изготовление позиций добавлено",
 		logger.StringAttr("section", "made"),
 		logger.IntAttr("count", len(dto)),
-		logger.AnyAttr("dto", dto),
+		// TODO можно попробовать добавить вывод массивов
 	)
 
 	c.JSON(http.StatusCreated, response.IdResponse{Message: "Успешно создано"})

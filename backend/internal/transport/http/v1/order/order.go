@@ -32,6 +32,7 @@ func Register(api *gin.RouterGroup, service services.Order, middleware *middlewa
 	{
 		order.GET("", handler.get)
 		order.GET("/:id", handler.getById)
+		order.GET("/important", handler.getImportant)
 		order.POST("", handler.create)
 		order.PUT("/:id", handler.update)
 		order.DELETE("/:id", handler.delete)
@@ -132,6 +133,16 @@ func (h *Handler) getById(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response.DataResponse{Data: order})
+}
+
+func (h *Handler) getImportant(c *gin.Context) {
+	orders, err := h.service.GetImportant(c)
+	if err != nil {
+		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		error_bot.Send(c, err.Error(), nil)
+		return
+	}
+	c.JSON(http.StatusOK, response.DataResponse{Data: orders})
 }
 
 func (h *Handler) create(c *gin.Context) {

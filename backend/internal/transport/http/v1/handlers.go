@@ -4,9 +4,7 @@ import (
 	"github.com/Alexander272/ring_orders/backend/internal/config"
 	"github.com/Alexander272/ring_orders/backend/internal/services"
 	"github.com/Alexander272/ring_orders/backend/internal/transport/http/middleware"
-	"github.com/Alexander272/ring_orders/backend/internal/transport/http/v1/accepted"
 	"github.com/Alexander272/ring_orders/backend/internal/transport/http/v1/auth"
-	"github.com/Alexander272/ring_orders/backend/internal/transport/http/v1/made"
 	"github.com/Alexander272/ring_orders/backend/internal/transport/http/v1/order"
 	"github.com/Alexander272/ring_orders/backend/internal/transport/http/v1/position"
 	"github.com/gin-gonic/gin"
@@ -39,7 +37,6 @@ func (h *Handler) Init(group *gin.RouterGroup) {
 	// roles.Register(v1, h.services.Role, h.middleware)
 
 	order.Register(v1, h.services.Order, h.middleware)
-	position.Register(v1, h.services.Position, h.middleware)
-	accepted.Register(v1, h.services.Accepted, h.middleware)
-	made.Register(v1, h.services.Made, h.middleware)
+	position.Register(v1, h.services, h.middleware)
+
 }

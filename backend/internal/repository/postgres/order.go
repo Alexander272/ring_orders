@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/Alexander272/ring_orders/backend/internal/models"
 	"github.com/google/uuid"
@@ -25,6 +26,7 @@ func NewOrderRepo(db *sqlx.DB) *OrderRepo {
 type Order interface {
 	Get(ctx context.Context, req *models.GetOrderDTO) ([]*models.Order, error)
 	GetById(ctx context.Context, id string) (*models.Order, error)
+	GetImportant(ctx context.Context) (*models.ImportantOrders, error)
 	Create(ctx context.Context, dto *models.CreateOrderDTO) error
 	Update(ctx context.Context, order *models.OrderDTO) error
 	Delete(ctx context.Context, dto *models.DeleteOrderDTO) error
@@ -106,6 +108,26 @@ func (r *OrderRepo) GetById(ctx context.Context, id string) (*models.Order, erro
 	return data, nil
 }
 
+func (r *OrderRepo) GetImportant(ctx context.Context) (*models.ImportantOrders, error) {
+	query := fmt.Sprintf(`SELECT COUNT(CASE WHEN urgent = TRUE THEN 1 END) AS urgent, 
+		COUNT(CASE WHEN date_of_dispatch < $1 THEN 1 END) AS overdue, COUNT(CASE WHEN date_of_dispatch-$2 <= $3 THEN 1 END) AS nearest
+		FROM %s WHERE closing_date = 0`,
+		OrdersTable,
+	)
+
+	data := &models.ImportantOrders{}
+	now := time.Now()
+	overdue := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, time.Local).Unix()
+	nearest := time.Date(now.Year(), now.Month(), now.Day()-1, 0, 0, 0, 0, time.Local).Unix()
+
+	day := time.Duration(2) * time.Hour * 24
+
+	if err := r.db.GetContext(ctx, data, query, overdue, nearest, day.Seconds()); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return data, nil
+}
+
 func (r *OrderRepo) Create(ctx context.Context, dto *models.CreateOrderDTO) error {
 	query := fmt.Sprintf(`INSERT INTO %s(id, order_number, notes, date_of_issue, date_of_dispatch, urgent, status) 
 		VALUES (:id, :order_number, :notes, :date_of_issue, :date_of_dispatch, :urgent, :status)`,
@@ -122,7 +144,7 @@ func (r *OrderRepo) Create(ctx context.Context, dto *models.CreateOrderDTO) erro
 
 func (r *OrderRepo) Update(ctx context.Context, dto *models.OrderDTO) error {
 	//TODO надо наверное как-то обновлять только часть полей
-	query := fmt.Sprintf(`UPDATE %s SET notes=:notes, date_of_dispatch=:date_of_dispatch, date_of_adoption=:date_of_adoption, 
+	query := fmt.Sprintf(`UPDATE %s SET notes=:notes, date_of_dispatch=:date_of_dispatch, date_of_adoption=:date_of_adoption, closing_date=:closing_date,
 		urgent=:urgent, status=:status, updated_at=now() WHERE id=:id`,
 		OrdersTable,
 	)
@@ -135,7 +157,7 @@ func (r *OrderRepo) Update(ctx context.Context, dto *models.OrderDTO) error {
 }
 
 func (r *OrderRepo) Delete(ctx context.Context, dto *models.DeleteOrderDTO) error {
-	query := fmt.Sprintf(`DELETE FROM %s WHERE id=$1`, OrdersTable)
+	query := fmt.Sprintf(`DELETE FROM %s WHERE id=:id`, OrdersTable)
 
 	_, err := r.db.NamedExecContext(ctx, query, dto)
 	if err != nil {

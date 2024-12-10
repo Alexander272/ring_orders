@@ -7,6 +7,8 @@ import (
 	"github.com/Alexander272/ring_orders/backend/internal/models/response"
 	"github.com/Alexander272/ring_orders/backend/internal/services"
 	"github.com/Alexander272/ring_orders/backend/internal/transport/http/middleware"
+	"github.com/Alexander272/ring_orders/backend/internal/transport/http/v1/position/accepted"
+	"github.com/Alexander272/ring_orders/backend/internal/transport/http/v1/position/made"
 	"github.com/Alexander272/ring_orders/backend/pkg/error_bot"
 	"github.com/gin-gonic/gin"
 )
@@ -21,14 +23,17 @@ func NewHandler(service services.Position) *Handler {
 	}
 }
 
-func Register(api *gin.RouterGroup, service services.Position, middleware *middleware.Middleware) {
-	handler := NewHandler(service)
+func Register(api *gin.RouterGroup, service *services.Services, middleware *middleware.Middleware) {
+	handler := NewHandler(service.Position)
 
 	positions := api.Group("/positions")
 	{
 		positions.GET("", handler.get)
-		// positions.PUT("/:id", handler.update)
+		positions.PUT("/several", handler.update)
 	}
+
+	made.Register(positions, service.Made, middleware)
+	accepted.Register(positions, service.Accepted, middleware)
 }
 
 func (h *Handler) get(c *gin.Context) {
@@ -37,8 +42,9 @@ func (h *Handler) get(c *gin.Context) {
 		response.NewErrorResponse(c, http.StatusBadRequest, "empty order", "Заказ не указан")
 		return
 	}
+	sort := c.Query("sort")
 
-	dto := &models.GetPositionDTO{OrderId: orderId}
+	dto := &models.GetPositionDTO{OrderId: orderId, Sort: sort}
 	data, err := h.service.Get(c, dto)
 	if err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
@@ -46,4 +52,19 @@ func (h *Handler) get(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response.DataResponse{Data: data, Total: len(data)})
+}
+
+func (h *Handler) update(c *gin.Context) {
+	dto := []*models.UpdatePositionDTO{}
+	if err := c.BindJSON(&dto); err != nil {
+		response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Отправлены некорректные данные")
+		return
+	}
+
+	if err := h.service.UpdateSeveral(c, dto); err != nil {
+		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		error_bot.Send(c, err.Error(), dto)
+		return
+	}
+	c.JSON(http.StatusOK, response.DataResponse{Data: dto})
 }

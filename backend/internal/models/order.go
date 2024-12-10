@@ -18,6 +18,12 @@ type Order struct {
 	Total          int       `json:"-" db:"total_count"`
 }
 
+type ImportantOrders struct {
+	Urgent  int `json:"urgent" db:"urgent"`
+	Overdue int `json:"overdue" db:"overdue"`
+	Nearest int `json:"nearest" db:"nearest"`
+}
+
 type GetOrderDTO struct {
 	Page    *Page
 	Sort    []*Sort
