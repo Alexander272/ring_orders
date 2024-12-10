@@ -22,7 +22,7 @@ export default function Order() {
 				display={'flex'}
 				flexDirection={'column'}
 				overflow={'auto'}
-				sx={{ backgroundColor: '#fff', userSelect: 'none' }}
+				sx={{ backgroundColor: '#fff' }}
 			>
 				{id ? <OrderData id={id} /> : null}
 			</Box>

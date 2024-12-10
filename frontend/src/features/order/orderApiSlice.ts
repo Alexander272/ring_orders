@@ -2,7 +2,7 @@ import { toast } from 'react-toastify'
 
 import type { IBaseFetchError } from '@/app/types/error'
 import type { IParams } from '@/app/types/params'
-import type { IOrder, IOrderDTO } from './types/order'
+import type { IImportantOrders, IOrder, IOrderDTO } from './types/order'
 import { apiSlice } from '@/app/apiSlice'
 import { API } from '@/app/api'
 import { buildSiUrlParams } from './utils/buildUrlParams'
@@ -42,7 +42,24 @@ export const orderApiSlice = apiSlice.injectEndpoints({
 					toast.error(fetchError.data.message, { autoClose: false })
 				}
 			},
-			providesTags: [{ type: 'Orders', id: 'ALL' }],
+			providesTags: (_arg, _error, id) => [{ type: 'Orders', id: id }],
+		}),
+
+		getImportant: builder.query<{ data: IImportantOrders }, null>({
+			query: () => ({
+				url: API.orders.important,
+				method: 'GET',
+			}),
+			onQueryStarted: async (_arg, api) => {
+				try {
+					await api.queryFulfilled
+				} catch (error) {
+					console.log(error)
+					const fetchError = (error as IBaseFetchError).error
+					toast.error(fetchError.data.message, { autoClose: false })
+				}
+			},
+			providesTags: [{ type: 'Orders', id: 'Important' }],
 		}),
 
 		createOrder: builder.mutation<null, IOrderDTO>({
@@ -51,7 +68,10 @@ export const orderApiSlice = apiSlice.injectEndpoints({
 				method: 'POST',
 				body: data,
 			}),
-			invalidatesTags: [{ type: 'Orders', id: 'ALL' }],
+			invalidatesTags: [
+				{ type: 'Orders', id: 'ALL' },
+				{ type: 'Orders', id: 'Important' },
+			],
 		}),
 		updateOrder: builder.mutation<null, IOrderDTO>({
 			query: data => ({
@@ -59,14 +79,21 @@ export const orderApiSlice = apiSlice.injectEndpoints({
 				method: 'PUT',
 				body: data,
 			}),
-			invalidatesTags: [{ type: 'Orders', id: 'ALL' }],
+			invalidatesTags: (_arg, _error, data) => [
+				{ type: 'Orders', id: 'ALL' },
+				{ type: 'Orders', id: 'Important' },
+				{ type: 'Orders', id: data.id },
+			],
 		}),
 		deleteOrder: builder.mutation<null, string>({
 			query: id => ({
 				url: `${API.orders.base}/${id}`,
 				method: 'DELETE',
 			}),
-			invalidatesTags: [{ type: 'Orders', id: 'ALL' }],
+			invalidatesTags: [
+				{ type: 'Orders', id: 'ALL' },
+				{ type: 'Orders', id: 'Important' },
+			],
 		}),
 	}),
 })
@@ -74,6 +101,7 @@ export const orderApiSlice = apiSlice.injectEndpoints({
 export const {
 	useGetOrdersQuery,
 	useGetOrderByIdQuery,
+	useGetImportantQuery,
 	useCreateOrderMutation,
 	useUpdateOrderMutation,
 	useDeleteOrderMutation,

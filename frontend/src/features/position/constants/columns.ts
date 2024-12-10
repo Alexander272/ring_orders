@@ -37,3 +37,11 @@ export const Columns: IColumn[] = [
 		formatter: value => numberFormat(value as number),
 	},
 ]
+
+export const EditColumns = [
+	{ ...Columns[0], width: 60 },
+	{ ...Columns[1], width: 300 },
+	{ ...Columns[2], width: 300 },
+	...Columns.slice(3, Columns.length),
+	{ key: 'actions', label: '', width: 100 },
+]

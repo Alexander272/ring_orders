@@ -1,8 +1,7 @@
 import { FC } from 'react'
-import { Button, Stack, Typography } from '@mui/material'
+import { Stack, Typography } from '@mui/material'
 
-import { useAppDispatch, useAppSelector } from '@/hooks/redux'
-import { changeDialogIsOpen } from '@/features/dialog/dialogSlice'
+import { useAppSelector } from '@/hooks/redux'
 import { getSelected } from '../../positionSlice'
 
 type Props = {
@@ -11,11 +10,11 @@ type Props = {
 
 export const Footer: FC<Props> = ({ total }) => {
 	const selected = useAppSelector(getSelected)
-	const dispatch = useAppDispatch()
+	// const dispatch = useAppDispatch()
 
-	const clickHandler = () => {
-		dispatch(changeDialogIsOpen({ variant: 'Made', isOpen: true }))
-	}
+	// const clickHandler = () => {
+	// 	dispatch(changeDialogIsOpen({ variant: 'Made', isOpen: true }))
+	// }
 
 	const selectedCount = Object.keys(selected).length
 
@@ -29,27 +28,29 @@ export const Footer: FC<Props> = ({ total }) => {
 			justifyContent={'space-between'}
 			// sx={{ backgroundColor: '#f5f5f5', borderRadius: 2 }}
 		>
-			<Stack>
-				<Typography>
-					Всего наименований:{' '}
-					<Typography component={'span'} fontWeight={'bold'}>
-						{total}
-					</Typography>
-				</Typography>
-
+			{/* <Stack>
 				{selectedCount > 0 ? (
-					<Typography>
-						Строк выбрано:{' '}
-						<Typography component={'span'} fontWeight={'bold'}>
-							{selectedCount}
-						</Typography>
-					</Typography>
+					
 				) : null}
-			</Stack>
+			</Stack> */}
 
-			<Button onClick={clickHandler} disabled={selectedCount === 0} sx={{ textTransform: 'inherit', width: 180 }}>
+			<Typography>
+				Строк выбрано:{' '}
+				<Typography component={'span'} fontWeight={'bold'}>
+					{selectedCount}
+				</Typography>
+			</Typography>
+
+			<Typography>
+				Всего наименований:{' '}
+				<Typography component={'span'} fontWeight={'bold'}>
+					{total}
+				</Typography>
+			</Typography>
+
+			{/* <Button onClick={clickHandler} disabled={selectedCount === 0} sx={{ textTransform: 'inherit', width: 180 }}>
 				Изготовлено
-			</Button>
+			</Button> */}
 		</Stack>
 	)
 }

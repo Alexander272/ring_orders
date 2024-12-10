@@ -14,7 +14,13 @@ export interface IPosition {
 }
 
 export interface IPositionDTO {
+	count: number
 	name: string | null
 	note: string | null
 	amount: number | null
+}
+
+export interface IGetPosition {
+	orderId: string
+	sort?: string
 }

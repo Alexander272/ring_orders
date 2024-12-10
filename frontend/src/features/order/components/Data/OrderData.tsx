@@ -1,14 +1,27 @@
 import { FC } from 'react'
-import { Breadcrumbs, Button, Stack, Typography } from '@mui/material'
+import { Breadcrumbs, Button, Stack, Tooltip, Typography, useTheme } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 
 import type { IFetchError } from '@/app/types/error'
 import { DateFormat, DateTimeFormat } from '@/constants/date'
 import { AppRoutes } from '@/constants/routes'
+import { PermRules } from '@/constants/permissions'
+import { useAppDispatch } from '@/hooks/redux'
 import { PositionTable } from '@/features/position/components/Table/PositionTable'
+import { MadeDialog } from '@/features/position/components/Dialog/MadeDialog'
+import { AcceptDialog } from '@/features/position/components/Dialog/AcceptDialog'
+import { useGetPositionsQuery } from '@/features/position/positionApiSlice'
+import { changeDialogIsOpen } from '@/features/dialog/dialogSlice'
+import { useCheckPermission } from '@/features/auth/hooks/check'
 import { Breadcrumb } from '@/components/Breadcrumb/Breadcrumb'
+import { TopFallback } from '@/components/Fallback/TopFallback'
+import { Confirm } from '@/components/Confirm/Confirm'
 import { Fallback } from '@/components/Fallback/Fallback'
+import { PlusIcon } from '@/components/Icons/PlusIcon'
+import { UrgentIcon } from '@/components/Icons/UrgentIcon'
+import { PenIcon } from '@/components/Icons/PenIcon'
 import { useGetOrderByIdQuery, useUpdateOrderMutation } from '../../orderApiSlice'
 
 type Props = {
@@ -16,10 +29,30 @@ type Props = {
 }
 
 export const OrderData: FC<Props> = ({ id }) => {
+	const { palette } = useTheme()
+	const navigate = useNavigate()
+
+	const canOrderWrite = useCheckPermission(PermRules.Orders.Write)
+	const canMade = useCheckPermission(PermRules.Made.Write)
+	const canAccepted = useCheckPermission(PermRules.Accept.Write)
+
 	const { data: order, isFetching } = useGetOrderByIdQuery(id, { skip: !id })
+	const { data: positions } = useGetPositionsQuery(
+		{ orderId: id, sort: canAccepted ? 'isAccepted' : 'isDone' },
+		{ skip: !id }
+	)
 	const data = order?.data
 
-	const [update] = useUpdateOrderMutation()
+	const dispatch = useAppDispatch()
+
+	const [update, { isLoading }] = useUpdateOrderMutation()
+
+	const isDone = positions?.data.every(p => p.isDone || p.isDeleted)
+	const isAccepted = positions?.data.every(p => p.isAccepted || p.isDeleted)
+
+	const editHandler = () => {
+		navigate(AppRoutes.EditOrder.replace(':id', id))
+	}
 
 	const statusHandler = async () => {
 		if (data?.status != 'new') return
@@ -33,13 +66,38 @@ export const OrderData: FC<Props> = ({ id }) => {
 		}
 	}
 
+	const closeOrderHandler = async () => {
+		if (!data) return
+		try {
+			await update({ ...data, status: 'closed', closingDate: dayjs().unix() }).unwrap()
+			toast.success('Заказ закрыт')
+		} catch (error) {
+			const fetchError = error as IFetchError
+			toast.error(fetchError.data.message, { autoClose: false })
+		}
+	}
+
+	const openHandler = () => {
+		console.log('open', canMade, canAccepted)
+
+		if (canMade) dispatch(changeDialogIsOpen({ variant: 'Made', isOpen: true, content: data?.id || '' }))
+		if (canAccepted) dispatch(changeDialogIsOpen({ variant: 'Accept', isOpen: true, content: data?.id || '' }))
+	}
+
 	if (isFetching) return <Fallback />
 	if (!data) return null
 	return (
-		<Stack mt={1} mb={2} spacing={2}>
+		<Stack mt={1} mb={2} spacing={2} position={'relative'}>
 			<Stack>
-				<Typography fontSize={'1.4rem'} pl={0.5}>
-					Заказ №{data.count} ({data.orderNumber})
+				<Typography fontSize={'1.4rem'} pl={0.5} display={'flex'} alignItems={'center'}>
+					Заказ №{data.count} ({data.orderNumber}){' '}
+					{canOrderWrite && data.status != 'closed' ? (
+						<Tooltip title={'Редактировать заказ'}>
+							<Button onClick={editHandler} sx={{ ml: 1, minWidth: 48 }}>
+								<PenIcon fontSize={18} />
+							</Button>
+						</Tooltip>
+					) : null}
 				</Typography>
 
 				<Breadcrumbs aria-label='breadcrumb'>
@@ -50,11 +108,21 @@ export const OrderData: FC<Props> = ({ id }) => {
 				</Breadcrumbs>
 			</Stack>
 
+			{isLoading && <TopFallback />}
+
 			{/* Order info */}
 			<Stack direction={'row'} justifyContent={'space-between'} alignItems={'flex-end'} paddingX={1}>
 				<Stack>
 					<Typography>
-						Заказ от{' '}
+						{data.urgent ? (
+							<>
+								<UrgentIcon fill={'#ff8c00f2'} mr={0.5} fontSize={18} />
+								Срочный заказ{' '}
+							</>
+						) : (
+							<>Заказ </>
+						)}
+						от{' '}
 						<Typography fontWeight={'bold'} component={'span'}>
 							{dayjs(data.dateOfIssue * 1000).format(DateFormat)}
 						</Typography>{' '}
@@ -72,21 +140,61 @@ export const OrderData: FC<Props> = ({ id }) => {
 							</Typography>
 						</Typography>
 					) : null}
+					{data.closingDate > 0 ? (
+						<Typography>
+							Заказ закрыт -{' '}
+							<Typography fontWeight={'bold'} component={'span'}>
+								{dayjs(data.closingDate * 1000).format(DateTimeFormat)}
+							</Typography>
+						</Typography>
+					) : null}
 				</Stack>
 
-				<Button
-					onClick={statusHandler}
-					variant='outlined'
-					color={data.status == 'new' ? 'primary' : 'success'}
-					disabled={data.status == 'closed'}
-					sx={{ width: 200, padding: '6px 12px', textTransform: 'inherit' }}
-				>
-					{data.status == 'new' ? 'Принять' : 'Принят'} в работу
-				</Button>
+				{!canOrderWrite && data.status == 'new' ? (
+					<Button
+						onClick={statusHandler}
+						variant='outlined'
+						disabled={isLoading}
+						sx={{ width: 200, padding: '6px 12px', textTransform: 'inherit' }}
+					>
+						Принять в работу
+					</Button>
+				) : null}
+
+				{data.status == 'processing' && ((canMade && !isDone) || (canAccepted && !isAccepted)) ? (
+					<Button
+						onClick={openHandler}
+						variant='outlined'
+						sx={{ width: 200, padding: '6px 12px', textTransform: 'inherit' }}
+					>
+						<PlusIcon fontSize={12} mr={1} fill={palette.primary.main} />
+						Добавить
+					</Button>
+				) : null}
+				{canOrderWrite && isAccepted && data.status != 'closed' ? (
+					<Confirm
+						confirmTitle='Закрытие заказа'
+						iconColor='#ebcb31'
+						buttonColor='primary'
+						confirmText={'Вы действительно хотите закрыть заказ?'}
+						onClick={closeOrderHandler}
+						buttonComponent={
+							<Button
+								// onClick={closeOrderHandler}
+								variant='outlined'
+								sx={{ width: 200, padding: '6px 12px', textTransform: 'inherit' }}
+							>
+								Закрыть заказ
+							</Button>
+						}
+					/>
+				) : null}
 			</Stack>
 
 			{/* Positions */}
 			<PositionTable orderId={id} />
+			<MadeDialog />
+			<AcceptDialog />
 
 			{data.notes && (
 				<Stack paddingX={1}>

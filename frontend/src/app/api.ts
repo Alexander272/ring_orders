@@ -6,8 +6,12 @@ export const API = {
 	},
 	orders: {
 		base: `orders` as const,
+		important: `orders/important` as const,
 	},
 	positions: {
 		base: `positions` as const,
+		several: `positions/several` as const,
+		made: `positions/made` as const,
+		accept: `positions/accepted` as const,
 	},
 }

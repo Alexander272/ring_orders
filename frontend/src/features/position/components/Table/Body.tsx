@@ -1,6 +1,8 @@
 import { FC } from 'react'
 import { FixedSizeList } from 'react-window'
 
+import { PermRules } from '@/constants/permissions'
+import { useCheckPermission } from '@/features/auth/hooks/check'
 import { Fallback } from '@/components/Fallback/Fallback'
 import { NoRowsOverlay } from '@/components/NoRowsOverlay/NoRowsOverlay'
 import { TableBody } from '@/components/Table/TableBody'
@@ -15,7 +17,22 @@ type Props = {
 }
 
 export const Body: FC<Props> = ({ orderId }) => {
-	const { data, isFetching, isLoading } = useGetPositionsQuery(orderId, { skip: !orderId })
+	const canAccept = useCheckPermission(PermRules.Accept.Write)
+	const { data, isFetching, isLoading } = useGetPositionsQuery(
+		{ orderId, sort: canAccept ? 'isAccepted' : 'isDone' },
+		{ skip: !orderId }
+	)
+
+	// data?.data?.sort((a, b) =>
+	// 	canAccept ? Number(a.isAccepted) - Number(b.isAccepted) : Number(a.isDone) - Number(b.isDone)
+	// )
+
+	// const sorted = [...(data?.data || [])].sort((a, b) => {
+	// 	let ok = a.isDone
+	// 	if (canAccept) ok = a.isAccepted
+	// 	//TODO не работает
+	// 	return ok ? 1 : a.count - b.count
+	// })
 
 	if (!isLoading && !data?.total) return <NoRowsOverlay />
 	return (

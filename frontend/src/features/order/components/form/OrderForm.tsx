@@ -17,6 +17,7 @@ import { ContextMenu } from '@/components/DataSheet/ContextMenu'
 import { AddRow } from '@/components/DataSheet/AddRow'
 import { Checkbox } from '@/components/Checkbox/Checkbox'
 import { useCreateOrderMutation } from '../../orderApiSlice'
+import { TopFallback } from '@/components/Fallback/TopFallback'
 
 const defaultValues: IOrderDTO = {
 	orderNumber: '',
@@ -30,11 +31,11 @@ const defaultValues: IOrderDTO = {
 
 export const OrderForm = () => {
 	const navigate = useNavigate()
-	const [rows, setRows] = useState<IPositionDTO[]>([{ name: null, note: null, amount: null }])
+	const [rows, setRows] = useState<IPositionDTO[]>([{ count: 1, name: null, note: null, amount: null }])
 
 	const { control, handleSubmit, reset } = useForm<IOrderDTO>({ defaultValues })
 
-	const [create] = useCreateOrderMutation()
+	const [create, { isLoading }] = useCreateOrderMutation()
 
 	const cancelHandler = () => {
 		navigate(AppRoutes.Home)
@@ -51,7 +52,8 @@ export const OrderForm = () => {
 			toast.error('Поле "Изготовить, шт" обязательно для заполнения')
 			return
 		}
-		positions.forEach(p => {
+		positions.forEach((p, i) => {
+			p.count = i + 1
 			if (p.note == null) p.note = ''
 		})
 		form.positions = positions
@@ -60,7 +62,7 @@ export const OrderForm = () => {
 			await create(form).unwrap()
 			toast.success('Заказ успешно создан')
 			reset()
-			setRows([{ name: null, note: null, amount: null }])
+			setRows([{ count: 1, name: null, note: null, amount: null }])
 		} catch (error) {
 			const fetchError = error as IFetchError
 			toast.error(fetchError.data.message, { autoClose: false })
@@ -78,7 +80,7 @@ export const OrderForm = () => {
 	]
 
 	return (
-		<Stack mt={2} mb={2} spacing={2} component={'form'} onSubmit={handleSubmit(saveHandler)}>
+		<Stack mt={2} mb={2} spacing={2} component={'form'} position={'relative'} onSubmit={handleSubmit(saveHandler)}>
 			<Stack>
 				<Typography fontSize={'1.4rem'} pl={0.5}>
 					Новый заказ
@@ -171,6 +173,8 @@ export const OrderForm = () => {
 					Сохранить
 				</Button>
 			</Stack>
+
+			{isLoading ? <TopFallback /> : null}
 		</Stack>
 	)
 }

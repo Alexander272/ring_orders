@@ -8,6 +8,7 @@ import { TableCell } from '@/components/Table/TableCell'
 import { CellText } from '@/components/CellText/CellText'
 import { Columns } from '../../constants/columns'
 import { AppRoutes } from '@/constants/routes'
+import dayjs from 'dayjs'
 // import { setContextMenu } from '../../tableSlice'
 
 type Props = {
@@ -38,8 +39,19 @@ export const Row: FC<Props> = ({ data, sx }) => {
 		navigate(AppRoutes.Order.replace(':id', data.id))
 	}
 
+	const overdue = dayjs(data.dateOfDispatch * 1000)
+		.endOf('day')
+		.isBefore(dayjs())
+	const nearest = dayjs(data.dateOfDispatch * 1000)
+		.subtract(1, 'day')
+		.startOf('day')
+		.isBefore(dayjs())
+
 	let background = ''
 	if (data.urgent) background = '#ff8d005c'
+	if (overdue) background = '#ff10106b'
+	if (nearest) background = '#dbc60675'
+	if (data.status == 'closed') background = '#e9e9e969'
 	// let background = data.itemStyle?.background
 	// if (selected[data.id]) background = palette.rowActive.light
 	// if (contextMenu?.active == data.id) background = palette.rowActive.main

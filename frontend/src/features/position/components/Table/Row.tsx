@@ -1,7 +1,9 @@
 import { CSSProperties, FC } from 'react'
 
 import type { IPosition } from '@/features/position/types/position'
+import { PermRules } from '@/constants/permissions'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
+import { useCheckPermission } from '@/features/auth/hooks/check'
 import { TableRow } from '@/components/Table/TableRow'
 import { TableCell } from '@/components/Table/TableCell'
 import { CellText } from '@/components/CellText/CellText'
@@ -17,8 +19,10 @@ export const Row: FC<Props> = ({ data, sx }) => {
 	const selected = useAppSelector(getSelected)
 	const dispatch = useAppDispatch()
 
+	const canAccept = useCheckPermission(PermRules.Accept.Write)
+
 	const selectHandler = () => {
-		if (data.isDeleted || data.isDone) return
+		if (data.isDeleted || (canAccept ? data.isAccepted : data.isDone)) return
 		dispatch(setSelected(data))
 	}
 
@@ -32,10 +36,10 @@ export const Row: FC<Props> = ({ data, sx }) => {
 	// }
 
 	let styles = {}
-	if (data.isDone) {
+	if (canAccept ? data.isAccepted : data.isDone) {
 		styles = {
 			// backgroundColor: '#ebebeba1',
-			color: '#545454',
+			color: '#787878',
 		}
 	}
 	if (data.isDeleted) {
@@ -70,13 +74,10 @@ export const Row: FC<Props> = ({ data, sx }) => {
 			hover
 			sx={{
 				...sx,
-				// backgroundColor: background,
 				...styles,
 			}}
 		>
 			{Columns.map(c => {
-				// if (hidden[c.key]) return null
-
 				let value = data[c.key as keyof IPosition]?.toString() || '-'
 				if (c.formatter) value = c.formatter(data[c.key as keyof IPosition])
 

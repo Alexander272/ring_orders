@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { Button } from '@mui/material'
+import { toast } from 'react-toastify'
 
 import { useAppSelector } from '@/hooks/redux'
 import { Badge } from '@/components/Badge/Badge'
@@ -18,7 +19,8 @@ export const Filters = () => {
 		<>
 			<Button
 				ref={anchor}
-				onClick={toggleHandler}
+				onClick={() => toast.error('Не реализовано')}
+				// onClick={toggleHandler}
 				variant='outlined'
 				color='inherit'
 				sx={{ minWidth: 30, paddingX: 1.5 }}

@@ -8,6 +8,7 @@ import { Home } from '@/pages/home/HomeLazy'
 import { Auth } from '@/pages/auth/AuthLazy'
 import { NewOrder } from '@/pages/new-order/NewOrderLazy'
 import { Order } from '@/pages/order/OrderLazy'
+import { EditOrder } from '@/pages/edit-order/EditOrderLazy'
 // import PrivateRoute from './PrivateRoute'
 
 const config: RouteObject[] = [
@@ -34,6 +35,10 @@ const config: RouteObject[] = [
 					{
 						path: AppRoutes.Order,
 						element: <Order />,
+					},
+					{
+						path: AppRoutes.EditOrder,
+						element: <EditOrder />,
 					},
 				],
 			},

@@ -4,21 +4,25 @@ import { WarningIcon } from '../Icons/WarningIcon'
 
 type Props = {
 	onClick: () => void
+	fullWidth?: boolean
 	width?: string
 	iconColor?: string
 	buttonComponent?: JSX.Element
 	confirmTitle?: string
 	confirmText: string
+	disabled?: boolean
 	buttonColor?: 'error' | 'inherit' | 'primary' | 'secondary' | 'success' | 'info' | 'warning'
 }
 
 export const Confirm: FC<Props> = ({
+	fullWidth,
 	width,
 	onClick,
 	iconColor,
 	buttonComponent,
 	confirmTitle,
 	confirmText,
+	disabled,
 	buttonColor = 'error',
 }) => {
 	const [open, setOpen] = useState(false)
@@ -27,6 +31,7 @@ export const Confirm: FC<Props> = ({
 	const { palette } = useTheme()
 
 	const toggleHandler = (event: MouseEvent) => {
+		if (disabled) return
 		event.stopPropagation()
 		setOpen(prev => !prev)
 	}
@@ -36,8 +41,15 @@ export const Confirm: FC<Props> = ({
 		onClick()
 	}
 
+	let styles = {}
+	if (fullWidth != undefined) {
+		styles = { width: '100%', maxWidth: width ? width : 'inherit' }
+	} else {
+		styles = { width: width ? width : 'inherit' }
+	}
+
 	return (
-		<Box ref={anchor} onClick={toggleHandler} sx={{ width: width ? width : 'inherit' }}>
+		<Box ref={anchor} onClick={toggleHandler} sx={styles}>
 			{buttonComponent ? (
 				buttonComponent
 			) : (

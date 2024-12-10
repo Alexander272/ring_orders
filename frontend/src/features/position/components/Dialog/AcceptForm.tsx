@@ -1,11 +1,11 @@
 import { FC, useEffect, useState } from 'react'
-import { Column, DataSheetGrid, intColumn, keyColumn, textColumn } from 'react-datasheet-grid'
 import { Button, Stack } from '@mui/material'
+import { Column, DataSheetGrid, intColumn, keyColumn, textColumn } from 'react-datasheet-grid'
 import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 
 import type { IFetchError } from '@/app/types/error'
-import type { IMade, IMadeDTO } from '../../types/made'
+import type { IAccept, IAcceptDTO } from '../../types/accept'
 import { PermRules } from '@/constants/permissions'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
 import { removeSpace } from '@/utils/format'
@@ -14,13 +14,13 @@ import { useCheckPermission } from '@/features/auth/hooks/check'
 import { TopFallback } from '@/components/Fallback/TopFallback'
 import { getSelected } from '../../positionSlice'
 import { useGetPositionsQuery } from '../../positionApiSlice'
-import { useCreateMadeMutation } from '../../madeApiSlice'
+import { useCreateAcceptMutation } from '../../acceptApiSlice'
 
 type Props = {
 	orderId: string
 }
 
-export const MadeForm: FC<Props> = ({ orderId }) => {
+export const AcceptForm: FC<Props> = ({ orderId }) => {
 	const selected = useAppSelector(getSelected)
 	const positions = Object.values(selected).sort((a, b) => (a.count < b.count ? -1 : 1))
 
@@ -31,10 +31,9 @@ export const MadeForm: FC<Props> = ({ orderId }) => {
 		{ skip: !orderId }
 	)
 
-	const [rows, setRows] = useState<IMadeDTO[]>([])
-	// const positions = Object.values(selected).sort((a, b) => (a.count > b.count ? -1 : 1))
+	const [rows, setRows] = useState<IAcceptDTO[]>([])
 
-	const [create, { isLoading }] = useCreateMadeMutation()
+	const [create, { isLoading }] = useCreateAcceptMutation()
 
 	const dispatch = useAppDispatch()
 
@@ -43,18 +42,18 @@ export const MadeForm: FC<Props> = ({ orderId }) => {
 			positionId: p.id,
 			count: p.count,
 			name: p.name,
-			remainder: p.amount - p.made,
+			remainder: p.made - p.accepted,
 			amount: null,
 		}))
 
 		if (!positions.length && data) {
 			newRows = data.data
-				.filter(d => !d.isDone && !d.isDeleted)
+				.filter(d => !d.isAccepted && !d.isDeleted)
 				.map(p => ({
 					positionId: p.id,
 					count: p.count,
 					name: p.name,
-					remainder: p.amount - p.made,
+					remainder: p.made - p.accepted,
 					amount: null,
 				}))
 		}
@@ -63,30 +62,35 @@ export const MadeForm: FC<Props> = ({ orderId }) => {
 	}, [])
 
 	const columns: Column[] = [
-		{ ...keyColumn<IMadeDTO, 'count'>('count', intColumn), title: '№', width: 0.1, disabled: true },
-		{ ...keyColumn<IMadeDTO, 'name'>('name', textColumn), title: 'Наименование', disabled: true },
-		{ ...keyColumn<IMadeDTO, 'remainder'>('remainder', intColumn), title: 'Осталось', disabled: true, width: 0.5 },
+		{ ...keyColumn<IAcceptDTO, 'count'>('count', intColumn), title: '№', width: 0.1, disabled: true },
+		{ ...keyColumn<IAcceptDTO, 'name'>('name', textColumn), title: 'Наименование', disabled: true },
 		{
-			...keyColumn<IMadeDTO, 'amount'>('amount', intColumn),
-			title: 'Изготовлено',
+			...keyColumn<IAcceptDTO, 'remainder'>('remainder', intColumn),
+			title: 'Осталось',
+			disabled: true,
+			width: 0.5,
+		},
+		{
+			...keyColumn<IAcceptDTO, 'amount'>('amount', intColumn),
+			title: 'Принято',
 			width: 0.5,
 			prePasteValues: removeSpace,
 		},
 	]
 
 	const cancelHandler = () => {
-		dispatch(changeDialogIsOpen({ variant: 'Made', isOpen: false }))
+		dispatch(changeDialogIsOpen({ variant: 'Accept', isOpen: false }))
 	}
 
 	const saveHandler = async () => {
 		try {
 			const newRows = rows.filter(r => r.amount)
 			if (newRows.some(r => (r.remainder || 0) < (r.amount || 0))) {
-				toast.error('Количество которое было изготовлено не может превышать остаток')
+				toast.error('Количество которое было принято не может превышать остаток')
 				return
 			}
 
-			const dto: IMade[] = newRows.map(r => ({
+			const dto: IAccept[] = newRows.map(r => ({
 				id: r.positionId,
 				positionId: r.positionId,
 				date: dayjs().unix(),
