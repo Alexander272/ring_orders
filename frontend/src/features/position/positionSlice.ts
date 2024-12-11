@@ -24,7 +24,7 @@ const positionSlice = createSlice({
 			}
 		},
 
-		resetState: () => initialState,
+		resetPositions: () => initialState,
 	},
 })
 
@@ -33,4 +33,4 @@ export const positionReducer = positionSlice.reducer
 
 export const getSelected = (state: RootState) => state.position.selected
 
-export const { setSelected, resetState } = positionSlice.actions
+export const { setSelected, resetPositions } = positionSlice.actions

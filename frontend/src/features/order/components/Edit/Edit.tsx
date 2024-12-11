@@ -1,58 +1,61 @@
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Breadcrumbs, Button, FormControl, Stack, TextField, Typography } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
-import { Controller, FormProvider, useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
+import './styles.css'
 
 import type { IFetchError } from '@/app/types/error'
-import type { IPosition } from '@/features/position/types/position'
-import type { IEditOrderDTO } from '../../types/order'
+import type { IEditPositionDTO, IPosition } from '@/features/position/types/position'
+import type { IOrderDTO } from '../../types/order'
 import { AppRoutes } from '@/constants/routes'
 import { DateFormat } from '@/constants/date'
 import { useGetPositionsQuery, useUpdatePositionsMutation } from '@/features/position/positionApiSlice'
-import { EditTable } from '@/features/position/components/EditTable/EditTable'
 import { Fallback } from '@/components/Fallback/Fallback'
 import { TopFallback } from '@/components/Fallback/TopFallback'
 import { Breadcrumb } from '@/components/Breadcrumb/Breadcrumb'
 import { Checkbox } from '@/components/Checkbox/Checkbox'
 import { Confirm } from '@/components/Confirm/Confirm'
 import { useDeleteOrderMutation, useGetOrderByIdQuery, useUpdateOrderMutation } from '../../orderApiSlice'
+import { Table } from './Table'
 
 type Props = {
 	id: string
 }
 
-const defaultValues: IEditOrderDTO = {
+const defaultValues: IOrderDTO = {
 	orderNumber: '',
 	dateOfIssue: dayjs().unix(),
 	dateOfDispatch: dayjs().add(10, 'day').unix(),
 	urgent: false,
 	notes: '',
 	status: 'new',
-	positions: [],
 }
 
 export const Edit: FC<Props> = ({ id }) => {
 	const navigate = useNavigate()
 
+	const [rows, setRows] = useState<IEditPositionDTO[]>([])
+
 	const { data, isFetching } = useGetOrderByIdQuery(id, { skip: !id })
-	const { data: positions } = useGetPositionsQuery({ orderId: id }, { skip: !id })
+	const { data: positions, isLoading } = useGetPositionsQuery({ orderId: id }, { skip: !id })
 
 	const [remove, { isLoading: isDeleting }] = useDeleteOrderMutation()
 	const [update, { isLoading: isUpdating }] = useUpdateOrderMutation()
 	const [updatePositions, { isLoading: isUpdatingPositions }] = useUpdatePositionsMutation()
 
-	const methods = useForm<IEditOrderDTO>({
-		defaultValues,
-		values: { ...(data?.data || defaultValues), positions: positions?.data || [] },
-	})
+	const methods = useForm<IOrderDTO>({ defaultValues, values: data?.data })
 	const {
 		control,
 		handleSubmit,
 		formState: { dirtyFields },
 	} = methods
+
+	useEffect(() => {
+		if (positions) setRows(positions.data)
+	}, [positions])
 
 	const cancelHandler = () => {
 		navigate(AppRoutes.Order.replace(':id', id))
@@ -72,14 +75,34 @@ export const Edit: FC<Props> = ({ id }) => {
 	const submitHandler = handleSubmit(async form => {
 		console.log(form, dirtyFields)
 
+		// const newPositions: IPosition[] = []
+		// if (dirtyFields.positions) {
+		// 	dirtyFields.positions.forEach((_p, i) => {
+		// 		newPositions.push(form.positions![i])
+		// 	})
+		// }
+		// let hasChanges = false
+		// if (Object.keys(dirtyFields).some(k => k != 'positions')) hasChanges = true
+
+		let ok = true
 		const newPositions: IPosition[] = []
-		if (dirtyFields.positions) {
-			dirtyFields.positions.forEach((_p, i) => {
-				newPositions.push(form.positions![i])
-			})
+		for (let i = 0; i < positions!.data.length; i++) {
+			//TODO надо это по тестировать
+			if (
+				rows[i].isDeleted != positions?.data[i].isDeleted ||
+				rows[i].amount != positions?.data[i].amount ||
+				rows[i].note != positions?.data[i].note
+			) {
+				ok = ok && (rows[i].amount || 0) >= (positions?.data[i].made || 0)
+				newPositions.push(rows[i] as IPosition)
+			}
 		}
-		let hasChanges = false
-		if (Object.keys(dirtyFields).some(k => k != 'positions')) hasChanges = true
+		if (!ok) {
+			toast.error('Количество для изготовления меньше, чем уже изготовлено')
+			return
+		}
+
+		const hasChanges = Object.keys(dirtyFields).length > 0
 
 		try {
 			if (newPositions.length) await updatePositions(newPositions).unwrap()
@@ -136,21 +159,28 @@ export const Edit: FC<Props> = ({ id }) => {
 					<Controller
 						control={control}
 						name={'dateOfDispatch'}
-						render={({ field }) => (
+						rules={{ required: true }}
+						render={({ field, fieldState: { error } }) => (
 							<DatePicker
 								{...field}
 								value={dayjs(field.value * 1000)}
 								onChange={value => {
 									field.onChange(value?.startOf('d').unix())
 								}}
+								slotProps={{
+									textField: {
+										error: Boolean(error),
+										helperText: error ? 'Обязательное поле' : '',
+									},
+								}}
 							/>
 						)}
 					/>
 				</FormControl>
 			</Stack>
-			<FormProvider {...methods}>
-				<EditTable />
-			</FormProvider>
+
+			{/* //TODO вытащить таблицу в отдельный компонент */}
+			{isLoading ? <Fallback /> : <Table rows={rows} onChange={setRows} />}
 
 			<Controller
 				control={control}

@@ -49,12 +49,9 @@ export const Row: FC<Props> = ({ data, sx }) => {
 
 	let background = ''
 	if (data.urgent) background = '#ff8d005c'
-	if (overdue) background = '#ff10106b'
 	if (nearest) background = '#dbc60675'
+	if (overdue) background = '#ff10106b'
 	if (data.status == 'closed') background = '#e9e9e969'
-	// let background = data.itemStyle?.background
-	// if (selected[data.id]) background = palette.rowActive.light
-	// if (contextMenu?.active == data.id) background = palette.rowActive.main
 
 	return (
 		<TableRow

@@ -44,12 +44,13 @@ export const OrderForm = () => {
 	const saveHandler = async (form: IOrderDTO) => {
 		console.log(form)
 
-		// const positions = [...rows]
-		// console.log('keys', Object.keys(positions[1]))
-
 		const positions = rows.filter(p => p.name)
 		if (positions.some(p => !p.amount)) {
 			toast.error('Поле "Изготовить, шт" обязательно для заполнения')
+			return
+		}
+		if (!positions.length) {
+			toast.error('Необходимо добавить хотя бы одну позицию')
 			return
 		}
 		positions.forEach((p, i) => {
@@ -102,19 +103,35 @@ export const OrderForm = () => {
 				<Controller
 					control={control}
 					name={'orderNumber'}
-					render={({ field }) => <TextField {...field} label='Номер заказа' fullWidth />}
+					rules={{ required: true }}
+					render={({ field, fieldState: { error } }) => (
+						<TextField
+							{...field}
+							error={Boolean(error)}
+							helperText={error ? 'Обязательное поле' : ''}
+							label='Номер заказа'
+							fullWidth
+						/>
+					)}
 				/>
 
 				<FormControl fullWidth>
 					<Controller
 						control={control}
 						name={'dateOfIssue'}
-						render={({ field }) => (
+						rules={{ required: true }}
+						render={({ field, fieldState: { error } }) => (
 							<DatePicker
 								{...field}
 								value={dayjs(field.value * 1000)}
 								onChange={value => {
 									field.onChange(value?.startOf('d').unix())
+								}}
+								slotProps={{
+									textField: {
+										error: Boolean(error),
+										helperText: error ? 'Обязательное поле' : '',
+									},
 								}}
 								label='Дата заказа'
 							/>
@@ -125,12 +142,19 @@ export const OrderForm = () => {
 					<Controller
 						control={control}
 						name={'dateOfDispatch'}
-						render={({ field }) => (
+						rules={{ required: true }}
+						render={({ field, fieldState: { error } }) => (
 							<DatePicker
 								{...field}
 								value={dayjs(field.value * 1000)}
 								onChange={value => {
 									field.onChange(value?.startOf('d').unix())
+								}}
+								slotProps={{
+									textField: {
+										error: Boolean(error),
+										helperText: error ? 'Обязательное поле' : '',
+									},
 								}}
 								label='Дата исполнения'
 							/>

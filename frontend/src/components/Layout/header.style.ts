@@ -2,6 +2,12 @@ import styled from '@emotion/styled'
 import { styled as muiStyled } from '@mui/material'
 import { Link } from 'react-router-dom'
 
+export const ImageLink = styled(Link)`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+`
+
 export const NavLink = styled(Link)`
 	text-decoration: none;
 	font-size: 1.2rem;

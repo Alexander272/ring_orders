@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 import { Breadcrumbs, Button, Stack, Tooltip, Typography, useTheme } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -23,6 +23,7 @@ import { PlusIcon } from '@/components/Icons/PlusIcon'
 import { UrgentIcon } from '@/components/Icons/UrgentIcon'
 import { PenIcon } from '@/components/Icons/PenIcon'
 import { useGetOrderByIdQuery, useUpdateOrderMutation } from '../../orderApiSlice'
+import { setSelected } from '@/features/position/positionSlice'
 
 type Props = {
 	id: string
@@ -46,6 +47,10 @@ export const OrderData: FC<Props> = ({ id }) => {
 	const dispatch = useAppDispatch()
 
 	const [update, { isLoading }] = useUpdateOrderMutation()
+
+	useEffect(() => {
+		dispatch(setSelected([]))
+	}, [])
 
 	const isDone = positions?.data.every(p => p.isDone || p.isDeleted)
 	const isAccepted = positions?.data.every(p => p.isAccepted || p.isDeleted)

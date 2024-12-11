@@ -4,5 +4,6 @@ export const Titles = Object.freeze({
 	DateOfIssue: 'Дата получения',
 	DateOfDispatch: 'Дата отгрузки',
 	ClosingDate: 'Дата закрытия',
+	Urgent: 'Срочность заказа',
 	Status: 'Статус',
 })

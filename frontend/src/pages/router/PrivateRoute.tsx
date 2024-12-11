@@ -12,7 +12,7 @@ export default function PrivateRoute({ children }: PropsWithChildren) {
 	const menu = useAppSelector(getMenu)
 	const location = useLocation()
 
-	if (!token) return <Navigate to={AppRoutes.AUTH} state={{ from: location }} />
+	if (!token) return <Navigate to={AppRoutes.Auth} state={{ from: location }} />
 	if (!menu || !menu.length) return <Forbidden />
 
 	return children

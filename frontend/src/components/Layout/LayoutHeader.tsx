@@ -1,14 +1,13 @@
-import { AppBar, Box, MenuItem, Select, SelectChangeEvent, Stack, Toolbar } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { AppBar, MenuItem, Select, SelectChangeEvent, Stack, Toolbar } from '@mui/material'
 
-// import { useAppSelector } from '@/hooks/redux'
-import { useSignOutMutation } from '@/features/auth/authApiSlice'
-// import { getToken } from '@/features/user/userSlice'
-import { NavButton } from './header.style'
 import logo from '@/assets/logo.webp'
 
+import { AppRoutes } from '@/constants/routes'
 import { useAppDispatch } from '@/hooks/redux'
-import { useEffect, useState } from 'react'
+import { useSignOutMutation } from '@/features/auth/authApiSlice'
 import { setUser } from '@/features/user/userSlice'
+import { ImageLink, NavButton } from './header.style'
 
 export const LayoutHeader = () => {
 	const [signOut] = useSignOutMutation()
@@ -53,9 +52,9 @@ export const LayoutHeader = () => {
 					alignItems: 'inherit',
 				}}
 			>
-				<Box alignSelf={'center'} display={'flex'} alignItems={'center'}>
+				<ImageLink to={AppRoutes.Home}>
 					<img height={46} width={157} src={logo} alt='logo' />
-				</Box>
+				</ImageLink>
 				{/* {token && ( */}
 				<Stack direction={'row'} spacing={3} minHeight={'100%'}>
 					{/* <NavLink to='/'>Главная</NavLink> */}

@@ -23,17 +23,6 @@ export const Body: FC<Props> = ({ orderId }) => {
 		{ skip: !orderId }
 	)
 
-	// data?.data?.sort((a, b) =>
-	// 	canAccept ? Number(a.isAccepted) - Number(b.isAccepted) : Number(a.isDone) - Number(b.isDone)
-	// )
-
-	// const sorted = [...(data?.data || [])].sort((a, b) => {
-	// 	let ok = a.isDone
-	// 	if (canAccept) ok = a.isAccepted
-	// 	//TODO не работает
-	// 	return ok ? 1 : a.count - b.count
-	// })
-
 	if (!isLoading && !data?.total) return <NoRowsOverlay />
 	return (
 		<>

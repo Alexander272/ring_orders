@@ -20,7 +20,6 @@ export const buildSiUrlParams = (req: IParams): URLSearchParams => {
 		for (let i = 0; i < req.filters.length; i++) {
 			const f = req.filters[i]
 
-			console.log(i)
 			if (i == 0 || f.field != req.filters[i - 1].field) {
 				params.push([`filters[${f.field}]`, f.fieldType])
 			}

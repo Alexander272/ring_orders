@@ -12,9 +12,8 @@ export interface IHeadColumn {
 export type FilterType = 'number' | 'string' | 'date' | 'switch' | 'list'
 export interface IFullFilter {
 	type: FilterType
-	options?: unknown
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	// getOptions?: (arg: null) => any
+	options?: unknown[]
+	// getOptions?: (arg: unknown) => unknown
 }
 export interface IColumn {
 	key: string
@@ -28,6 +27,12 @@ export interface IColumn {
 	filter?: FilterType | IFullFilter
 	formatter?: (value: unknown) => string
 	styled?: (value: unknown) => SxProps
+}
+
+export interface IFilterColumn {
+	key: string
+	label: string
+	filter?: FilterType | IFullFilter
 }
 
 export interface IContextMenu {

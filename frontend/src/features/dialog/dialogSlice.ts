@@ -27,7 +27,7 @@ const dialogSlice = createSlice({
 			state[variant] = { isOpen, content }
 		},
 
-		resetState: () => initialState,
+		resetDialog: () => initialState,
 	},
 })
 
@@ -36,4 +36,4 @@ export const getDialogState = (variant: DialogVariants) => (state: RootState) =>
 export const dialogPath = dialogSlice.name
 export const dialogReducer = dialogSlice.reducer
 
-export const { changeDialogIsOpen, resetState } = dialogSlice.actions
+export const { changeDialogIsOpen, resetDialog } = dialogSlice.actions

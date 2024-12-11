@@ -12,7 +12,7 @@ import { removeSpace } from '@/utils/format'
 import { changeDialogIsOpen } from '@/features/dialog/dialogSlice'
 import { useCheckPermission } from '@/features/auth/hooks/check'
 import { TopFallback } from '@/components/Fallback/TopFallback'
-import { getSelected } from '../../positionSlice'
+import { getSelected, setSelected } from '../../positionSlice'
 import { useGetPositionsQuery } from '../../positionApiSlice'
 import { useCreateMadeMutation } from '../../madeApiSlice'
 
@@ -76,11 +76,16 @@ export const MadeForm: FC<Props> = ({ orderId }) => {
 
 	const cancelHandler = () => {
 		dispatch(changeDialogIsOpen({ variant: 'Made', isOpen: false }))
+		dispatch(setSelected([]))
 	}
 
 	const saveHandler = async () => {
 		try {
 			const newRows = rows.filter(r => r.amount)
+			if (!newRows.length) {
+				cancelHandler()
+				return
+			}
 			if (newRows.some(r => (r.remainder || 0) < (r.amount || 0))) {
 				toast.error('Количество которое было изготовлено не может превышать остаток')
 				return

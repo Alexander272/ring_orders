@@ -47,10 +47,12 @@ const tableSlice = createSlice({
 			else {
 				delete state.sort[action.payload]
 			}
+			localStorage.setItem(localKeys.sort, JSON.stringify(state.sort))
 		},
 
 		setFilters: (state, action: PayloadAction<IFilter[]>) => {
 			state.filters = action.payload
+			localStorage.setItem(localKeys.filters, JSON.stringify(state.filters))
 		},
 
 		// setSearch: (state, action: PayloadAction<string>) => {
