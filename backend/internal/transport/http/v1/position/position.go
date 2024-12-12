@@ -3,6 +3,7 @@ package position
 import (
 	"net/http"
 
+	"github.com/Alexander272/ring_orders/backend/internal/constants"
 	"github.com/Alexander272/ring_orders/backend/internal/models"
 	"github.com/Alexander272/ring_orders/backend/internal/models/response"
 	"github.com/Alexander272/ring_orders/backend/internal/services"
@@ -26,10 +27,10 @@ func NewHandler(service services.Position) *Handler {
 func Register(api *gin.RouterGroup, service *services.Services, middleware *middleware.Middleware) {
 	handler := NewHandler(service.Position)
 
-	positions := api.Group("/positions")
+	positions := api.Group("/positions", middleware.VerifyToken)
 	{
-		positions.GET("", handler.get)
-		positions.PUT("/several", handler.update)
+		positions.GET("", middleware.CheckPermissions(constants.Positions, constants.Read), handler.get)
+		positions.PUT("/several", middleware.CheckPermissions(constants.Positions, constants.Write), handler.update)
 	}
 
 	made.Register(positions, service.Made, middleware)

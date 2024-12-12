@@ -26,6 +26,7 @@ func NewOrderRepo(db *sqlx.DB) *OrderRepo {
 type Order interface {
 	Get(ctx context.Context, req *models.GetOrderDTO) ([]*models.Order, error)
 	GetById(ctx context.Context, id string) (*models.Order, error)
+	GetNumbers(ctx context.Context, dto *models.GetNumbersDTO) ([]string, error)
 	GetImportant(ctx context.Context) (*models.ImportantOrders, error)
 	Create(ctx context.Context, dto *models.CreateOrderDTO) error
 	Update(ctx context.Context, order *models.OrderDTO) error
@@ -60,6 +61,8 @@ func (r *OrderRepo) Get(ctx context.Context, req *models.GetOrderDTO) ([]*models
 	order := ""
 	if len(sorts) > 0 {
 		order = fmt.Sprintf("ORDER BY %s", strings.Join(sorts, ", "))
+	} else {
+		order = "ORDER BY count"
 	}
 
 	filters := []string{}
@@ -108,6 +111,25 @@ func (r *OrderRepo) GetById(ctx context.Context, id string) (*models.Order, erro
 	return data, nil
 }
 
+func (r *OrderRepo) GetNumbers(ctx context.Context, dto *models.GetNumbersDTO) ([]string, error) {
+	args := []interface{}{dto.Number}
+	limit := ""
+	if dto.Limit > 0 {
+		limit = " LIMIT $2"
+		args = append(args, dto.Limit)
+	}
+
+	query := fmt.Sprintf(`SELECT order_number FROM %s WHERE order_number LIKE '%%'||$1||'%%' ORDER BY order_number DESC %s`,
+		OrdersTable, limit,
+	)
+	data := []string{}
+
+	if err := r.db.SelectContext(ctx, &data, query, args...); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return data, nil
+}
+
 func (r *OrderRepo) GetImportant(ctx context.Context) (*models.ImportantOrders, error) {
 	query := fmt.Sprintf(`SELECT COUNT(CASE WHEN urgent = TRUE THEN 1 END) AS urgent, 
 		COUNT(CASE WHEN date_of_dispatch < $1 THEN 1 END) AS overdue, COUNT(CASE WHEN date_of_dispatch-$2 <= $3 THEN 1 END) AS nearest
@@ -118,7 +140,7 @@ func (r *OrderRepo) GetImportant(ctx context.Context) (*models.ImportantOrders, 
 	data := &models.ImportantOrders{}
 	now := time.Now()
 	overdue := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, time.Local).Unix()
-	nearest := time.Date(now.Year(), now.Month(), now.Day()-1, 0, 0, 0, 0, time.Local).Unix()
+	nearest := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local).Unix()
 
 	day := time.Duration(2) * time.Hour * 24
 

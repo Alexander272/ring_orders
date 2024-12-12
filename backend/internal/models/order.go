@@ -30,6 +30,11 @@ type GetOrderDTO struct {
 	Filters []*Filter
 }
 
+type GetNumbersDTO struct {
+	Number string `json:"number" binding:"required"`
+	Limit  int    `json:"limit"`
+}
+
 type CreateOrderDTO struct {
 	Id             string               `json:"id" db:"id"`
 	OrderNumber    string               `json:"orderNumber" db:"order_number" binding:"required"`

@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Alexander272/ring_orders/backend/internal/models"
 	"github.com/google/uuid"
@@ -90,10 +91,20 @@ func (r *PositionRepo) Update(ctx context.Context, dto *models.UpdatePositionDTO
 }
 
 func (r *PositionRepo) UpdateSeveral(ctx context.Context, dto []*models.UpdatePositionDTO) error {
-	query := fmt.Sprintf(`UPDATE %s SET note=:note, amount=:amount, is_deleted=:is_deleted, updated_at=now() WHERE id=:id`, PositionsTable)
+	values := []string{}
+	args := []interface{}{}
+	c := 4
+	for i, v := range dto {
+		args = append(args, v.Id, v.Note, v.Amount, v.IsDeleted)
+		values = append(values, fmt.Sprintf("($%d, $%d, $%d, $%d)", i*c+1, i*c+2, i*c+3, i*c+4))
+	}
 
-	_, err := r.db.NamedExecContext(ctx, query, dto)
-	if err != nil {
+	query := fmt.Sprintf(`UPDATE %s AS t SET note=s.note, amount=s.amount::integer, is_deleted=s.is_deleted::boolean, updated_at=now() 
+		FROM (VALUES %s) AS s(id, note, amount, is_deleted) WHERE t.id=s.id::uuid`,
+		PositionsTable, strings.Join(values, ","),
+	)
+
+	if _, err := r.db.ExecContext(ctx, query, args...); err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return nil

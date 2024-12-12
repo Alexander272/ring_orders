@@ -1,8 +1,13 @@
 package constants
 
-const ()
+const (
+	Orders    = "orders"
+	Positions = "positions"
+	Made      = "made"
+	Accept    = "accept"
+)
 
 const (
-	Read  = "Read"
-	Write = "Write"
+	Read  = "read"
+	Write = "write"
 )

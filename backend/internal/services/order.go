@@ -23,6 +23,7 @@ func NewOrderService(repo repository.Order, position Position) *OrderService {
 type Order interface {
 	Get(ctx context.Context, req *models.GetOrderDTO) ([]*models.Order, error)
 	GetById(ctx context.Context, id string) (*models.Order, error)
+	GetNumbers(ctx context.Context, dto *models.GetNumbersDTO) ([]string, error)
 	GetImportant(ctx context.Context) (*models.ImportantOrders, error)
 	Create(ctx context.Context, dto *models.CreateOrderDTO) error
 	Update(ctx context.Context, dto *models.OrderDTO) error
@@ -41,6 +42,14 @@ func (s *OrderService) GetById(ctx context.Context, id string) (*models.Order, e
 	data, err := s.repo.GetById(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get order by id. error: %w", err)
+	}
+	return data, nil
+}
+
+func (s *OrderService) GetNumbers(ctx context.Context, dto *models.GetNumbersDTO) ([]string, error) {
+	data, err := s.repo.GetNumbers(ctx, dto)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get order numbers. error: %w", err)
 	}
 	return data, nil
 }

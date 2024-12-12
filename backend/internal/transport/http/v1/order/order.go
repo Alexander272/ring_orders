@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Alexander272/ring_orders/backend/internal/constants"
 	"github.com/Alexander272/ring_orders/backend/internal/models"
 	"github.com/Alexander272/ring_orders/backend/internal/models/response"
 	"github.com/Alexander272/ring_orders/backend/internal/services"
@@ -28,14 +29,21 @@ func NewHandler(service services.Order) *Handler {
 func Register(api *gin.RouterGroup, service services.Order, middleware *middleware.Middleware) {
 	handler := NewHandler(service)
 
-	order := api.Group("/orders")
+	order := api.Group("/orders", middleware.VerifyToken)
 	{
-		order.GET("", handler.get)
-		order.GET("/:id", handler.getById)
-		order.GET("/important", handler.getImportant)
-		order.POST("", handler.create)
-		order.PUT("/:id", handler.update)
-		order.DELETE("/:id", handler.delete)
+		read := order.Group("", middleware.CheckPermissions(constants.Orders, constants.Read))
+		{
+			read.GET("", handler.get)
+			read.GET("/:id", handler.getById)
+			read.GET("/numbers", handler.getNumbers)
+			read.GET("/important", handler.getImportant)
+		}
+		write := order.Group("", middleware.CheckPermissions(constants.Orders, constants.Write))
+		{
+			write.POST("", handler.create)
+			write.PUT("/:id", handler.update)
+			write.DELETE("/:id", handler.delete)
+		}
 	}
 }
 
@@ -113,6 +121,27 @@ func (h *Handler) get(c *gin.Context) {
 		total = orders[0].Total
 	}
 	c.JSON(http.StatusOK, response.DataResponse{Data: orders, Total: total})
+}
+
+func (h *Handler) getNumbers(c *gin.Context) {
+	number := c.Query("number")
+	if number == "" {
+		response.NewErrorResponse(c, http.StatusBadRequest, "empty number", "Номер заказа не указан")
+		return
+	}
+
+	l := c.Query("limit")
+	limit, _ := strconv.Atoi(l)
+
+	dto := &models.GetNumbersDTO{Number: number, Limit: limit}
+
+	numbers, err := h.service.GetNumbers(c, dto)
+	if err != nil {
+		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		error_bot.Send(c, err.Error(), dto)
+		return
+	}
+	c.JSON(http.StatusOK, response.DataResponse{Data: numbers})
 }
 
 func (h *Handler) getById(c *gin.Context) {

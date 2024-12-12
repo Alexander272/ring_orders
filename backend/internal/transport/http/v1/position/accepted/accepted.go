@@ -3,6 +3,7 @@ package accepted
 import (
 	"net/http"
 
+	"github.com/Alexander272/ring_orders/backend/internal/constants"
 	"github.com/Alexander272/ring_orders/backend/internal/models"
 	"github.com/Alexander272/ring_orders/backend/internal/models/response"
 	"github.com/Alexander272/ring_orders/backend/internal/services"
@@ -27,10 +28,14 @@ func Register(api *gin.RouterGroup, service services.Accepted, middleware *middl
 
 	accepted := api.Group("/accepted")
 	{
-		accepted.GET("", handler.get)
-		accepted.POST("", handler.create)
-		accepted.PUT("/:id", handler.update)
-		accepted.DELETE("/:id", handler.delete)
+		accepted.GET("", middleware.CheckPermissions(constants.Accept, constants.Read), handler.get)
+		write := accepted.Group("", middleware.CheckPermissions(constants.Accept, constants.Write))
+		{
+			write.POST("", handler.create)
+			write.PUT("/:id", handler.update)
+			write.DELETE("/:id", handler.delete)
+		}
+
 	}
 }
 

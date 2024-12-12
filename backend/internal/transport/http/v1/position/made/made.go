@@ -3,6 +3,7 @@ package made
 import (
 	"net/http"
 
+	"github.com/Alexander272/ring_orders/backend/internal/constants"
 	"github.com/Alexander272/ring_orders/backend/internal/models"
 	"github.com/Alexander272/ring_orders/backend/internal/models/response"
 	"github.com/Alexander272/ring_orders/backend/internal/services"
@@ -27,10 +28,13 @@ func Register(api *gin.RouterGroup, service services.Made, middleware *middlewar
 
 	made := api.Group("/made")
 	{
-		made.GET("", handler.get)
-		made.POST("", handler.create)
-		made.PUT("/:id", handler.update)
-		made.DELETE("/:id", handler.delete)
+		made.GET("", middleware.CheckPermissions(constants.Made, constants.Read), handler.get)
+		write := made.Group("", middleware.CheckPermissions(constants.Made, constants.Write))
+		{
+			write.POST("", handler.create)
+			write.PUT("/:id", handler.update)
+			write.DELETE("/:id", handler.delete)
+		}
 	}
 }
 

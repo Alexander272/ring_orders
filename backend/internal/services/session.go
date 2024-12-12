@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/Alexander272/ring_orders/backend/internal/models"
@@ -90,6 +91,7 @@ func (s *SessionService) DecodeAccessToken(ctx context.Context, token string) (*
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode access token. error: %w", err)
 	}
+	service := os.Getenv("SERVICE_NAME")
 
 	user := &models.User{}
 	var role, username, userId string
@@ -99,8 +101,8 @@ func (s *SessionService) DecodeAccessToken(ctx context.Context, token string) (*
 		a := access.(map[string]interface{})["roles"]
 		roles := a.([]interface{})
 		for _, r := range roles {
-			if strings.Contains(r.(string), "reagents") {
-				role = strings.Replace(r.(string), "reagents_", "", 1)
+			if strings.Contains(r.(string), service) {
+				role = strings.Replace(r.(string), service+"_", "", 1)
 				break
 			}
 		}
