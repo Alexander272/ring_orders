@@ -9,7 +9,7 @@ import { Auth } from '@/pages/auth/AuthLazy'
 import { NewOrder } from '@/pages/new-order/NewOrderLazy'
 import { Order } from '@/pages/order/OrderLazy'
 import { EditOrder } from '@/pages/edit-order/EditOrderLazy'
-// import PrivateRoute from './PrivateRoute'
+import PrivateRoute from './PrivateRoute'
 
 const config: RouteObject[] = [
 	{
@@ -22,7 +22,7 @@ const config: RouteObject[] = [
 			},
 			{
 				path: AppRoutes.Home,
-				// element: <PrivateRoute />,
+				element: <PrivateRoute />,
 				children: [
 					{
 						index: true,

@@ -87,13 +87,13 @@ export const Edit: FC<Props> = ({ id }) => {
 		let ok = true
 		const newPositions: IPosition[] = []
 		for (let i = 0; i < positions!.data.length; i++) {
-			//TODO надо это по тестировать
 			if (
 				rows[i].isDeleted != positions?.data[i].isDeleted ||
 				rows[i].amount != positions?.data[i].amount ||
 				rows[i].note != positions?.data[i].note
 			) {
 				ok = ok && (rows[i].amount || 0) >= (positions?.data[i].made || 0)
+				rows[i].note = (rows[i].note || '').trim()
 				newPositions.push(rows[i] as IPosition)
 			}
 		}
@@ -179,7 +179,6 @@ export const Edit: FC<Props> = ({ id }) => {
 				</FormControl>
 			</Stack>
 
-			{/* //TODO вытащить таблицу в отдельный компонент */}
 			{isLoading ? <Fallback /> : <Table rows={rows} onChange={setRows} />}
 
 			<Controller

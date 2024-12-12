@@ -2,6 +2,7 @@ import { Box } from '@mui/material'
 
 import { PageBox } from '@/styled/PageBox'
 import { OrderForm } from '@/features/order/components/form/OrderForm'
+import CatContainer from '@/features/cat/components/Cat/CatContainer'
 
 export default function NewOrder() {
 	return (
@@ -21,6 +22,8 @@ export default function NewOrder() {
 				sx={{ backgroundColor: '#fff' }}
 			>
 				<OrderForm />
+
+				<CatContainer />
 			</Box>
 		</PageBox>
 	)

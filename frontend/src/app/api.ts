@@ -6,6 +6,7 @@ export const API = {
 	},
 	orders: {
 		base: `orders` as const,
+		numbers: `orders/numbers` as const,
 		important: `orders/important` as const,
 	},
 	positions: {

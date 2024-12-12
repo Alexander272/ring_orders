@@ -83,8 +83,7 @@ export const OrderData: FC<Props> = ({ id }) => {
 	}
 
 	const openHandler = () => {
-		console.log('open', canMade, canAccepted)
-
+		//TODO если доступно, и то, и другое, открываться будет только первая форма
 		if (canMade) dispatch(changeDialogIsOpen({ variant: 'Made', isOpen: true, content: data?.id || '' }))
 		if (canAccepted) dispatch(changeDialogIsOpen({ variant: 'Accept', isOpen: true, content: data?.id || '' }))
 	}

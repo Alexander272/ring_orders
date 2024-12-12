@@ -1,5 +1,14 @@
 import { useState } from 'react'
-import { Breadcrumbs, Button, FormControl, Stack, TextField, Typography } from '@mui/material'
+import {
+	Autocomplete,
+	Breadcrumbs,
+	Button,
+	CircularProgress,
+	FormControl,
+	Stack,
+	TextField,
+	Typography,
+} from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import { Column, DataSheetGrid, intColumn, keyColumn, textColumn } from 'react-datasheet-grid'
 import { useNavigate } from 'react-router-dom'
@@ -11,13 +20,14 @@ import type { IFetchError } from '@/app/types/error'
 import type { IPositionDTO } from '@/features/position/types/position'
 import type { IOrderDTO } from '../../types/order'
 import { AppRoutes } from '@/constants/routes'
+import { useDebounce } from '@/hooks/useDebounce'
 import { removeSpace } from '@/utils/format'
 import { Breadcrumb } from '@/components/Breadcrumb/Breadcrumb'
 import { ContextMenu } from '@/components/DataSheet/ContextMenu'
 import { AddRow } from '@/components/DataSheet/AddRow'
 import { Checkbox } from '@/components/Checkbox/Checkbox'
-import { useCreateOrderMutation } from '../../orderApiSlice'
 import { TopFallback } from '@/components/Fallback/TopFallback'
+import { useCreateOrderMutation, useGetNumbersQuery } from '../../orderApiSlice'
 
 const defaultValues: IOrderDTO = {
 	orderNumber: '',
@@ -33,8 +43,11 @@ export const OrderForm = () => {
 	const navigate = useNavigate()
 	const [rows, setRows] = useState<IPositionDTO[]>([{ count: 1, name: null, note: null, amount: null }])
 
-	const { control, handleSubmit, reset } = useForm<IOrderDTO>({ defaultValues })
+	const { control, handleSubmit, reset, watch } = useForm<IOrderDTO>({ defaultValues })
+	const number = watch('orderNumber')
+	const debounced = useDebounce(number, 700) as string
 
+	const { data, isFetching } = useGetNumbersQuery({ number: debounced, limit: 10 }, { skip: !debounced })
 	const [create, { isLoading }] = useCreateOrderMutation()
 
 	const cancelHandler = () => {
@@ -43,6 +56,11 @@ export const OrderForm = () => {
 
 	const saveHandler = async (form: IOrderDTO) => {
 		console.log(form)
+
+		if (data?.data.includes(form.orderNumber)) {
+			toast.error('Заказ с таким номером уже существует')
+			return
+		}
 
 		const positions = rows.filter(p => p.name)
 		if (positions.some(p => !p.amount)) {
@@ -55,9 +73,13 @@ export const OrderForm = () => {
 		}
 		positions.forEach((p, i) => {
 			p.count = i + 1
-			if (p.note == null) p.note = ''
+			p.name = p.name!.trim()
+			p.note = (p.note || '').trim()
 		})
 		form.positions = positions
+
+		form.orderNumber = form.orderNumber.trim()
+		form.notes = form.notes.trim()
 
 		try {
 			await create(form).unwrap()
@@ -81,7 +103,15 @@ export const OrderForm = () => {
 	]
 
 	return (
-		<Stack mt={2} mb={2} spacing={2} component={'form'} position={'relative'} onSubmit={handleSubmit(saveHandler)}>
+		<Stack
+			mt={2}
+			mb={2}
+			pb={5}
+			spacing={2}
+			component={'form'}
+			position={'relative'}
+			onSubmit={handleSubmit(saveHandler)}
+		>
 			<Stack>
 				<Typography fontSize={'1.4rem'} pl={0.5}>
 					Новый заказ
@@ -100,7 +130,7 @@ export const OrderForm = () => {
 
 			{/* Header №order, dateOfIssue, dateOfExecution */}
 			<Stack direction={'row'} justifyContent={'space-between'} spacing={2}>
-				<Controller
+				{/* <Controller
 					control={control}
 					name={'orderNumber'}
 					rules={{ required: true }}
@@ -111,6 +141,47 @@ export const OrderForm = () => {
 							helperText={error ? 'Обязательное поле' : ''}
 							label='Номер заказа'
 							fullWidth
+						/>
+					)}
+				/> */}
+				<Controller
+					control={control}
+					name={'orderNumber'}
+					rules={{ required: true }}
+					render={({ field, fieldState: { error } }) => (
+						<Autocomplete
+							// {...field}
+							value={field.value}
+							onChange={(_, value) => field.onChange(value)}
+							options={data?.data || []}
+							freeSolo
+							disableClearable
+							loading={isFetching}
+							size='small'
+							loadingText='Загрузка...'
+							noOptionsText='Ничего не найдено'
+							fullWidth
+							sx={{ '.MuiAutocomplete-inputRoot': { maxHeight: 35 } }}
+							renderInput={params => (
+								<TextField
+									{...params}
+									label='Номер заказа'
+									onChange={e => field.onChange(e.target.value)}
+									error={Boolean(error)}
+									helperText={error ? 'Обязательное поле' : ''}
+									slotProps={{
+										input: {
+											...params.InputProps,
+											endAdornment: (
+												<>
+													{isFetching ? <CircularProgress color='inherit' size={20} /> : null}
+													{params.InputProps.endAdornment}
+												</>
+											),
+										},
+									}}
+								/>
+							)}
 						/>
 					)}
 				/>

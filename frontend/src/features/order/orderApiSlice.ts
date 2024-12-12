@@ -45,6 +45,24 @@ export const orderApiSlice = apiSlice.injectEndpoints({
 			providesTags: (_arg, _error, id) => [{ type: 'Orders', id: id }],
 		}),
 
+		getNumbers: builder.query<{ data: string[] }, { number: string; limit?: number }>({
+			query: data => ({
+				url: API.orders.numbers,
+				method: 'GET',
+				params: { number: data.number, limit: data.limit || 0 },
+			}),
+			onQueryStarted: async (_arg, api) => {
+				try {
+					await api.queryFulfilled
+				} catch (error) {
+					console.log(error)
+					const fetchError = (error as IBaseFetchError).error
+					toast.error(fetchError.data.message, { autoClose: false })
+				}
+			},
+			providesTags: [{ type: 'Orders', id: 'Numbers' }],
+		}),
+
 		getImportant: builder.query<{ data: IImportantOrders }, null>({
 			query: () => ({
 				url: API.orders.important,
@@ -71,6 +89,7 @@ export const orderApiSlice = apiSlice.injectEndpoints({
 			invalidatesTags: [
 				{ type: 'Orders', id: 'ALL' },
 				{ type: 'Orders', id: 'Important' },
+				{ type: 'Orders', id: 'Numbers' },
 			],
 		}),
 		updateOrder: builder.mutation<null, IOrderDTO>({
@@ -93,6 +112,7 @@ export const orderApiSlice = apiSlice.injectEndpoints({
 			invalidatesTags: [
 				{ type: 'Orders', id: 'ALL' },
 				{ type: 'Orders', id: 'Important' },
+				{ type: 'Orders', id: 'Numbers' },
 			],
 		}),
 	}),
@@ -101,6 +121,7 @@ export const orderApiSlice = apiSlice.injectEndpoints({
 export const {
 	useGetOrdersQuery,
 	useGetOrderByIdQuery,
+	useGetNumbersQuery,
 	useGetImportantQuery,
 	useCreateOrderMutation,
 	useUpdateOrderMutation,

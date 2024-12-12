@@ -51,7 +51,7 @@ export const Row: FC<Props> = ({ data, sx }) => {
 	if (data.urgent) background = '#ff8d005c'
 	if (nearest) background = '#dbc60675'
 	if (overdue) background = '#ff10106b'
-	if (data.status == 'closed') background = '#e9e9e969'
+	if (data.status == 'closed') background = '#e9e9e9ab'
 
 	return (
 		<TableRow
