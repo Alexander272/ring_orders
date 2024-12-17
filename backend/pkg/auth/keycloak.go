@@ -63,3 +63,29 @@ func (k *KeycloakClient) Login(ctx context.Context) (*gocloak.JWT, error) {
 	}
 	return token, nil
 }
+
+func (k *KeycloakClient) GetGroupId(ctx context.Context, groupName string) (*gocloak.Group, error) {
+	token, err := k.Login(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	group, err := k.Client.GetGroupByPath(ctx, token.AccessToken, k.Realm, groupName)
+	if err != nil {
+		return nil, err
+	}
+	return group, nil
+}
+
+func (k *KeycloakClient) GetGroupMembers(ctx context.Context, groupId string) ([]*gocloak.User, error) {
+	token, err := k.Login(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	members, err := k.Client.GetGroupMembers(ctx, token.AccessToken, k.Realm, groupId, gocloak.GetGroupsParams{})
+	if err != nil {
+		return nil, err
+	}
+	return members, nil
+}

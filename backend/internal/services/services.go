@@ -14,6 +14,8 @@ type Services struct {
 	Session
 	Permission
 
+	Notification
+
 	Order
 	Position
 	Made
@@ -34,10 +36,12 @@ func NewServices(deps *Deps) *Services {
 	session := NewSessionService(deps.Keycloak, role)
 	permission := NewPermissionService("configs/privacy.conf", menu, role)
 
+	notification := NewNotificationService(deps.Repos.Notification, deps.Keycloak)
+
 	made := NewMadeService(deps.Repos.Made)
 	accepted := NewAcceptedService(deps.Repos.Accepted)
 	position := NewPositionService(deps.Repos.Position)
-	order := NewOrderService(deps.Repos.Order, position)
+	order := NewOrderService(deps.Repos.Order, position, notification)
 
 	return &Services{
 		MenuItem:   menuItem,
@@ -45,6 +49,8 @@ func NewServices(deps *Deps) *Services {
 		Role:       role,
 		Session:    session,
 		Permission: permission,
+
+		Notification: notification,
 
 		Order:    order,
 		Position: position,

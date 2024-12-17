@@ -13,7 +13,9 @@ type PositionService struct {
 }
 
 func NewPositionService(repo repository.Position) *PositionService {
-	return &PositionService{repo: repo}
+	return &PositionService{
+		repo: repo,
+	}
 }
 
 type Position interface {
@@ -57,6 +59,7 @@ func (s *PositionService) UpdateSeveral(ctx context.Context, dto []*models.Updat
 	if err := s.repo.UpdateSeveral(ctx, dto); err != nil {
 		return fmt.Errorf("failed to update several positions. error: %w", err)
 	}
+
 	return nil
 }
 

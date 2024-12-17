@@ -20,23 +20,20 @@ import (
 	"github.com/Alexander272/ring_orders/backend/pkg/database/postgres"
 	"github.com/Alexander272/ring_orders/backend/pkg/logger"
 	_ "github.com/lib/pq"
+	"github.com/subosito/gotenv"
 )
 
 func main() {
 	//* Init config
-	// if err := gotenv.Load("../.env"); err != nil {
-	// 	log.Fatalf("error loading env variables: %s", err.Error())
-	// }
+	if err := gotenv.Load("../.env"); err != nil {
+		log.Fatalf("error loading env variables: %s", err.Error())
+	}
 
 	conf, err := config.Init("configs/config.yaml")
 	if err != nil {
 		log.Fatalf("error initializing configs: %s", err.Error())
 	}
 	logger.NewLogger(logger.WithLevel(conf.LogLevel), logger.WithAddSource(conf.LogSource))
-
-	// if err := migrate.Migrate(&conf.Postgres); err != nil {
-	// 	log.Fatalf("failed to migrate: %s", err.Error())
-	// }
 
 	//* Dependencies
 	db, err := postgres.NewPostgresDB(&postgres.Config{

@@ -29,7 +29,7 @@ type Order interface {
 	GetNumbers(ctx context.Context, dto *models.GetNumbersDTO) ([]string, error)
 	GetImportant(ctx context.Context) (*models.ImportantOrders, error)
 	Create(ctx context.Context, dto *models.CreateOrderDTO) error
-	Update(ctx context.Context, order *models.OrderDTO) error
+	Update(ctx context.Context, order *models.UpdateOrderDTO) error
 	Delete(ctx context.Context, dto *models.DeleteOrderDTO) error
 }
 
@@ -164,7 +164,7 @@ func (r *OrderRepo) Create(ctx context.Context, dto *models.CreateOrderDTO) erro
 	return nil
 }
 
-func (r *OrderRepo) Update(ctx context.Context, dto *models.OrderDTO) error {
+func (r *OrderRepo) Update(ctx context.Context, dto *models.UpdateOrderDTO) error {
 	//TODO надо наверное как-то обновлять только часть полей
 	query := fmt.Sprintf(`UPDATE %s SET notes=:notes, date_of_dispatch=:date_of_dispatch, date_of_adoption=:date_of_adoption, closing_date=:closing_date,
 		urgent=:urgent, status=:status, updated_at=now() WHERE id=:id`,

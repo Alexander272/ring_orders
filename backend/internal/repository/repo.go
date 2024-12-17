@@ -28,6 +28,10 @@ type Accepted interface {
 	postgres.Accepted
 }
 
+type Notification interface {
+	postgres.Notification
+}
+
 type Repository struct {
 	Role
 	MenuItem
@@ -37,6 +41,8 @@ type Repository struct {
 	Position
 	Made
 	Accepted
+
+	Notification
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -49,5 +55,7 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Position: postgres.NewPositionRepo(db),
 		Made:     postgres.NewMadeRepo(db),
 		Accepted: postgres.NewAcceptedRepo(db),
+
+		Notification: postgres.NewNotificationRepo(db),
 	}
 }
