@@ -2,7 +2,7 @@ import { toast } from 'react-toastify'
 
 import type { IBaseFetchError } from '@/app/types/error'
 import type { IParams } from '@/app/types/params'
-import type { IImportantOrders, IOrder, IOrderDTO } from './types/order'
+import type { IEditOrderDTO, IImportantOrders, IOrder, IOrderDTO } from './types/order'
 import { apiSlice } from '@/app/apiSlice'
 import { API } from '@/app/api'
 import { buildSiUrlParams } from './utils/buildUrlParams'
@@ -92,7 +92,8 @@ export const orderApiSlice = apiSlice.injectEndpoints({
 				{ type: 'Orders', id: 'Numbers' },
 			],
 		}),
-		updateOrder: builder.mutation<null, IOrderDTO>({
+
+		updateOrder: builder.mutation<null, IEditOrderDTO>({
 			query: data => ({
 				url: `${API.orders.base}/${data.id}`,
 				method: 'PUT',
@@ -102,8 +103,10 @@ export const orderApiSlice = apiSlice.injectEndpoints({
 				{ type: 'Orders', id: 'ALL' },
 				{ type: 'Orders', id: 'Important' },
 				{ type: 'Orders', id: data.id },
+				{ type: 'Positions', id: 'ALL' },
 			],
 		}),
+
 		deleteOrder: builder.mutation<null, string>({
 			query: id => ({
 				url: `${API.orders.base}/${id}`,

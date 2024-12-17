@@ -12,7 +12,7 @@ import type { IEditPositionDTO, IPosition } from '@/features/position/types/posi
 import type { IOrderDTO } from '../../types/order'
 import { AppRoutes } from '@/constants/routes'
 import { DateFormat } from '@/constants/date'
-import { useGetPositionsQuery, useUpdatePositionsMutation } from '@/features/position/positionApiSlice'
+import { useGetPositionsQuery } from '@/features/position/positionApiSlice'
 import { Fallback } from '@/components/Fallback/Fallback'
 import { TopFallback } from '@/components/Fallback/TopFallback'
 import { Breadcrumb } from '@/components/Breadcrumb/Breadcrumb'
@@ -44,7 +44,7 @@ export const Edit: FC<Props> = ({ id }) => {
 
 	const [remove, { isLoading: isDeleting }] = useDeleteOrderMutation()
 	const [update, { isLoading: isUpdating }] = useUpdateOrderMutation()
-	const [updatePositions, { isLoading: isUpdatingPositions }] = useUpdatePositionsMutation()
+	// const [updatePositions, { isLoading: isUpdatingPositions }] = useUpdatePositionsMutation()
 
 	const methods = useForm<IOrderDTO>({ defaultValues, values: data?.data })
 	const {
@@ -102,11 +102,16 @@ export const Edit: FC<Props> = ({ id }) => {
 			return
 		}
 
-		const hasChanges = Object.keys(dirtyFields).length > 0
+		// const hasChanges = Object.keys(dirtyFields).length > 0
+
+		const newData = { ...form, hasChanged: Object.keys(dirtyFields).length > 0, positions: newPositions }
+		if (!newData.hasChanged && !newPositions.length) return
 
 		try {
-			if (newPositions.length) await updatePositions(newPositions).unwrap()
-			if (hasChanges) await update(form).unwrap()
+			//TODO похоже мне все-же нужно объединить эти два запроса
+			// if (newPositions.length) await updatePositions(newPositions).unwrap()
+			// if (hasChanges) await update(form).unwrap()
+			await update(newData).unwrap()
 			toast.success('Заказ обновлен')
 			navigate(AppRoutes.Order.replace(':id', id))
 		} catch (error) {
@@ -119,7 +124,7 @@ export const Edit: FC<Props> = ({ id }) => {
 	if (!data) return null
 	return (
 		<Stack mt={1} mb={2} position={'relative'} component={'form'} onSubmit={submitHandler}>
-			{isDeleting || isUpdating || isUpdatingPositions ? <TopFallback /> : null}
+			{isDeleting || isUpdating ? <TopFallback /> : null}
 
 			<Stack>
 				<Typography fontSize={'1.4rem'} pl={0.5} display={'flex'} alignItems={'center'}>

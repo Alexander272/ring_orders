@@ -31,6 +31,7 @@ export interface IOrderDTO {
 }
 
 export interface IEditOrderDTO extends IOrderDTO {
+	hasChanged: boolean
 	positions?: IPosition[]
 }
 
