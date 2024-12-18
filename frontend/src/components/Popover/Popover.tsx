@@ -3,9 +3,18 @@ import { FC, PropsWithChildren } from 'react'
 
 interface Props extends MenuProps {
 	paperSx?: SxProps<Theme>
+	positionLeft?: string
 }
 
-export const Popover: FC<PropsWithChildren<Props>> = ({ children, open, onClose, anchorEl, paperSx, ...props }) => {
+export const Popover: FC<PropsWithChildren<Props>> = ({
+	children,
+	open,
+	onClose,
+	anchorEl,
+	positionLeft = '50%',
+	paperSx,
+	...props
+}) => {
 	return (
 		<Menu
 			open={open}
@@ -14,7 +23,7 @@ export const Popover: FC<PropsWithChildren<Props>> = ({ children, open, onClose,
 			transformOrigin={{ horizontal: 'center', vertical: 'top' }}
 			anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
 			MenuListProps={{
-				role: 'listbox',
+				// role: 'listbox',
 				disableListWrap: true,
 			}}
 			slotProps={{
@@ -33,7 +42,7 @@ export const Popover: FC<PropsWithChildren<Props>> = ({ children, open, onClose,
 							display: 'block',
 							position: 'absolute',
 							top: 0,
-							left: '50%',
+							left: positionLeft,
 							width: 10,
 							height: 10,
 							bgcolor: 'background.paper',

@@ -4,6 +4,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { ToastContainer } from 'react-toastify'
 import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/ru'
 import 'react-toastify/dist/ReactToastify.min.css'
 import 'react-datasheet-grid/dist/style.css'
@@ -14,6 +15,7 @@ import { AppRouter } from '@/pages/router/AppRouter'
 import { theme } from '@/theme/theme'
 
 dayjs.locale('ru') // глобальная локализация дат
+dayjs.extend(relativeTime)
 
 function App() {
 	return (

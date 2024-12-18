@@ -15,4 +15,7 @@ export const API = {
 		made: `positions/made` as const,
 		accept: `positions/accepted` as const,
 	},
+	notifications: {
+		base: `notifications` as const,
+	},
 }

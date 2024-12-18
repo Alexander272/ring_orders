@@ -104,7 +104,12 @@ export const Edit: FC<Props> = ({ id }) => {
 
 		// const hasChanges = Object.keys(dirtyFields).length > 0
 
-		const newData = { ...form, hasChanged: Object.keys(dirtyFields).length > 0, positions: newPositions }
+		const newData = {
+			...form,
+			isEdit: true,
+			hasChanged: Object.keys(dirtyFields).length > 0,
+			positions: newPositions,
+		}
 		if (!newData.hasChanged && !newPositions.length) return
 
 		try {

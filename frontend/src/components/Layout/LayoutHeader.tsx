@@ -6,6 +6,7 @@ import { AppRoutes } from '@/constants/routes'
 import { useAppSelector } from '@/hooks/redux'
 import { useSignOutMutation } from '@/features/auth/authApiSlice'
 import { getToken } from '@/features/user/userSlice'
+import { Notification } from '@/features/notification/components/Notification/Notification'
 import { ImageLink, NavButton } from './header.style'
 
 export const LayoutHeader = () => {
@@ -30,6 +31,8 @@ export const LayoutHeader = () => {
 				</ImageLink>
 				{token && (
 					<Stack direction={'row'} spacing={3} minHeight={'100%'}>
+						<Notification />
+
 						{/* <NavLink to='/'>Главная</NavLink> */}
 
 						{/* {CheckPermission({ section: 'criterions', method: 'WRITE' }) && (

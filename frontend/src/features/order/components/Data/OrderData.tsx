@@ -5,10 +5,12 @@ import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 
 import type { IFetchError } from '@/app/types/error'
+import type { IEditOrderDTO } from '../../types/order'
 import { DateFormat, DateTimeFormat } from '@/constants/date'
 import { AppRoutes } from '@/constants/routes'
 import { PermRules } from '@/constants/permissions'
 import { useAppDispatch } from '@/hooks/redux'
+import { setSelected } from '@/features/position/positionSlice'
 import { PositionTable } from '@/features/position/components/Table/PositionTable'
 import { MadeDialog } from '@/features/position/components/Dialog/MadeDialog'
 import { AcceptDialog } from '@/features/position/components/Dialog/AcceptDialog'
@@ -23,7 +25,6 @@ import { PlusIcon } from '@/components/Icons/PlusIcon'
 import { UrgentIcon } from '@/components/Icons/UrgentIcon'
 import { PenIcon } from '@/components/Icons/PenIcon'
 import { useGetOrderByIdQuery, useUpdateOrderMutation } from '../../orderApiSlice'
-import { setSelected } from '@/features/position/positionSlice'
 
 type Props = {
 	id: string
@@ -62,8 +63,14 @@ export const OrderData: FC<Props> = ({ id }) => {
 	const statusHandler = async () => {
 		if (data?.status != 'new') return
 
+		const newData: IEditOrderDTO = {
+			...data,
+			hasChanged: true,
+			status: 'processing',
+			dateOfAdoption: dayjs().unix(),
+		}
 		try {
-			await update({ ...data, status: 'processing', dateOfAdoption: dayjs().unix() }).unwrap()
+			await update(newData).unwrap()
 			toast.success('Заказ принят в работу')
 		} catch (error) {
 			const fetchError = error as IFetchError
@@ -73,8 +80,10 @@ export const OrderData: FC<Props> = ({ id }) => {
 
 	const closeOrderHandler = async () => {
 		if (!data) return
+
+		const newData: IEditOrderDTO = { ...data, hasChanged: true, status: 'closed', closingDate: dayjs().unix() }
 		try {
-			await update({ ...data, status: 'closed', closingDate: dayjs().unix() }).unwrap()
+			await update(newData).unwrap()
 			toast.success('Заказ закрыт')
 		} catch (error) {
 			const fetchError = error as IFetchError
