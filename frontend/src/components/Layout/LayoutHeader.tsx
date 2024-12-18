@@ -6,8 +6,9 @@ import { AppRoutes } from '@/constants/routes'
 import { useAppSelector } from '@/hooks/redux'
 import { useSignOutMutation } from '@/features/auth/authApiSlice'
 import { getToken } from '@/features/user/userSlice'
-import { Notification } from '@/features/notification/components/Notification/Notification'
+import { Notification } from '@/features/notification/components/Notification/NotificationLazy'
 import { ImageLink, NavButton } from './header.style'
+import { Suspense } from 'react'
 
 export const LayoutHeader = () => {
 	const [signOut] = useSignOutMutation()
@@ -31,7 +32,9 @@ export const LayoutHeader = () => {
 				</ImageLink>
 				{token && (
 					<Stack direction={'row'} spacing={3} minHeight={'100%'}>
-						<Notification />
+						<Suspense>
+							<Notification />
+						</Suspense>
 
 						{/* <NavLink to='/'>Главная</NavLink> */}
 

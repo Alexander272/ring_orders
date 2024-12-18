@@ -78,3 +78,5 @@ export const Notification = () => {
 		</Stack>
 	)
 }
+
+export default Notification
