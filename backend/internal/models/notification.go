@@ -5,6 +5,7 @@ type Notification struct {
 	UserId   string   `json:"userId" db:"user_id"`
 	Title    string   `json:"title" db:"title"`
 	Text     string   `json:"text" db:"text"`
+	Link     string   `json:"link" db:"link"`
 	Date     int64    `json:"date" db:"date"`
 	Priority Priority `json:"priority" db:"priority"`
 }
@@ -28,6 +29,7 @@ type NotificationDTO struct {
 	Groups   []Group  `json:"group" db:"group"`
 	Title    string   `json:"title" db:"title"`
 	Text     string   `json:"text" db:"text"`
+	Link     string   `json:"link" db:"link"`
 	Date     int64    `json:"date" db:"date"`
 	Priority Priority `json:"priority" db:"priority"`
 }

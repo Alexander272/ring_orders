@@ -48,6 +48,7 @@ func (s *NotificationService) Publish(ctx context.Context, dto *models.Notificat
 			UserId:   u,
 			Title:    dto.Title,
 			Text:     dto.Text,
+			Link:     dto.Link,
 			Priority: dto.Priority,
 		}
 		messages = append(messages, mes)

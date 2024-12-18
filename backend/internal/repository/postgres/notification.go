@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Alexander272/ring_orders/backend/internal/models"
+	"github.com/Alexander272/ring_orders/backend/pkg/logger"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -28,7 +29,7 @@ type Notification interface {
 }
 
 func (r *NotificationRepo) Get(ctx context.Context, req *models.GetNotificationsDTO) ([]*models.Notification, error) {
-	query := fmt.Sprintf(`SELECT id, user_id, title, text, date, priority FROM %s WHERE user_id=$1 ORDER BY date DESC`, NotificationsTable)
+	query := fmt.Sprintf(`SELECT id, user_id, title, text, link, date, priority FROM %s WHERE user_id=$1 ORDER BY date DESC`, NotificationsTable)
 	data := []*models.Notification{}
 
 	if err := r.db.SelectContext(ctx, &data, query, req.UserId); err != nil {
@@ -38,8 +39,8 @@ func (r *NotificationRepo) Get(ctx context.Context, req *models.GetNotifications
 }
 
 func (r *NotificationRepo) Create(ctx context.Context, dto *models.NotificationDTO) error {
-	query := fmt.Sprintf(`INSERT INTO %s(id, user_id, title, text, date, priority) 
-		VALUES (:id, :user_id, :title, :text, :date, :priority)`,
+	query := fmt.Sprintf(`INSERT INTO %s(id, user_id, title, text, link, date, priority) 
+		VALUES (:id, :user_id, :title, :text, :link, :date, :priority)`,
 		NotificationsTable,
 	)
 	dto.Id = uuid.NewString()
@@ -53,8 +54,8 @@ func (r *NotificationRepo) Create(ctx context.Context, dto *models.NotificationD
 }
 
 func (r *NotificationRepo) CreateSeveral(ctx context.Context, dto []*models.NotificationDTO) error {
-	query := fmt.Sprintf(`INSERT INTO %s(id, user_id, title, text, date, priority) 
-		VALUES (:id, :user_id, :title, :text, :date, :priority)`,
+	query := fmt.Sprintf(`INSERT INTO %s(id, user_id, title, text, link, date, priority) 
+		VALUES (:id, :user_id, :title, :text, :link, :date, :priority)`,
 		NotificationsTable,
 	)
 	for i := range dto {
@@ -76,8 +77,9 @@ func (r *NotificationRepo) Delete(ctx context.Context, dto *models.DeleteNotific
 	}
 
 	query := fmt.Sprintf(`DELETE FROM %s WHERE %s`, NotificationsTable, condition)
+	logger.Debug("notifications", logger.StringAttr("query", query))
 
-	_, err := r.db.ExecContext(ctx, query, dto)
+	_, err := r.db.NamedExecContext(ctx, query, dto)
 	if err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}

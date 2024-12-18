@@ -80,6 +80,7 @@ func (s *OrderService) Create(ctx context.Context, dto *models.CreateOrderDTO) e
 	s.notification.NewMessage(ctx, &models.NotificationDTO{
 		Title:    "Новый заказ",
 		Text:     fmt.Sprintf("Добавлен новый заказ №%s", dto.OrderNumber),
+		Link:     fmt.Sprintf("/order/%s", dto.Id),
 		Groups:   []models.Group{models.UserGroup},
 		Priority: models.Low,
 	})
@@ -102,16 +103,19 @@ func (s *OrderService) Update(ctx context.Context, dto *models.UpdateOrderDTO) e
 		}
 	}
 
-	if len(dto.Positions) > 0 && dto.HasChanged {
-		text = fmt.Sprintf("Заказ №%s и позиции в нем обновлены", dto.OrderNumber)
+	if dto.IsEdit {
+		if len(dto.Positions) > 0 && dto.HasChanged {
+			text = fmt.Sprintf("Заказ №%s и позиции в нем обновлены", dto.OrderNumber)
+		}
+		// TODO если обновился статус - уведомление не нужно?
+		s.notification.NewMessage(ctx, &models.NotificationDTO{
+			Title:    "Заказ обновлен",
+			Text:     text,
+			Link:     fmt.Sprintf("/order/%s", dto.Id),
+			Groups:   []models.Group{models.UserGroup},
+			Priority: models.Medium,
+		})
 	}
-	//TODO мне еще нужна ссылка
-	s.notification.NewMessage(ctx, &models.NotificationDTO{
-		Title:    "Заказ обновлен",
-		Text:     text,
-		Groups:   []models.Group{models.UserGroup},
-		Priority: models.Medium,
-	})
 	return nil
 }
 

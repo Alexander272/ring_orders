@@ -57,6 +57,7 @@ type UpdateOrderDTO struct {
 	Urgent         bool                 `json:"urgent" db:"urgent"`
 	Status         string               `json:"status" db:"status"`
 	HasChanged     bool                 `json:"hasChanged" db:"has_changed"`
+	IsEdit         bool                 `json:"isEdit" db:"is_edit"`
 	Positions      []*UpdatePositionDTO `json:"positions"`
 	UpdatedAt      time.Time            `json:"updatedAt" db:"updated_at"`
 }
