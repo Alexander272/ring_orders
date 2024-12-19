@@ -4,7 +4,7 @@ import { useAppSelector } from '@/hooks/redux'
 import { Fallback } from '@/components/Fallback/Fallback'
 import { NoRowsOverlay } from '@/components/NoRowsOverlay/NoRowsOverlay'
 import { TableBody } from '@/components/Table/TableBody'
-import { ColWidth, RowHeight, Size } from '../../constants/defaultValues'
+import { ColWidth, MaxSize, RowHeight, Size } from '../../constants/defaultValues'
 import { Columns } from '../../constants/columns'
 import { getTableSize } from '../../tableSlice'
 import { useGetAllData } from '../../hooks/query'
@@ -35,7 +35,7 @@ export const Body = () => {
 			{data && (
 				<FixedSizeList
 					overscanCount={10}
-					height={RowHeight * Size}
+					height={RowHeight * (size > Size ? MaxSize : Size)}
 					itemCount={data.data.length > (size || Size) ? size || Size : data.data.length}
 					itemSize={RowHeight}
 					width={Columns.reduce((ac, cur) => ac + (cur?.width || ColWidth), 10)}

@@ -56,11 +56,12 @@ export const Notification = () => {
 				</Badge>
 			</IconButton>
 
-			<Popover open={open} onClose={toggleHandler} anchorEl={anchor.current} positionLeft='69%'>
+			<Popover open={open} onClose={toggleHandler} anchorEl={anchor.current} positionLeft='71%'>
 				{isLoading && <Fallback position={'absolute'} top={0} left={0} />}
 
 				{data?.total ? (
 					<>
+						{/* //TODO сделать фильтр по приоритету */}
 						<List />
 						<Stack mr={2} pt={0.5} borderTop={'1px solid #e0e0e0'}>
 							<Button onClick={deleteHandler} color='inherit' sx={{ textTransform: 'inherit' }}>
@@ -70,9 +71,13 @@ export const Notification = () => {
 						</Stack>
 					</>
 				) : (
-					<Typography color='textSecondary' textAlign={'center'} sx={{ mt: 0.6, fontSize: 18 }}>
-						Уведомлений нет
-					</Typography>
+					<Stack alignItems={'center'} mt={3} mb={3}>
+						<BellOutlineIcon fontSize={40} fill={palette.text.secondary} mb={1} />
+
+						<Typography color='textSecondary' textAlign={'center'} sx={{ fontSize: 18 }}>
+							Уведомлений нет
+						</Typography>
+					</Stack>
 				)}
 			</Popover>
 		</Stack>

@@ -23,7 +23,7 @@ export const Popover: FC<PropsWithChildren<Props>> = ({
 			transformOrigin={{ horizontal: 'center', vertical: 'top' }}
 			anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
 			MenuListProps={{
-				// role: 'listbox',
+				role: 'listbox',
 				disableListWrap: true,
 			}}
 			slotProps={{
@@ -34,7 +34,7 @@ export const Popover: FC<PropsWithChildren<Props>> = ({
 						filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
 						mt: 1.5,
 						paddingX: 2,
-						paddingBottom: 2,
+						// paddingBottom: 2,
 						maxWidth: 400,
 						width: '100%',
 						'&:before': {

@@ -5,7 +5,7 @@ import dayjs from 'dayjs'
 import type { IFilter } from '@/app/types/params'
 import { AppRoutes } from '@/constants/routes'
 import { PermRules } from '@/constants/permissions'
-import { useAppDispatch } from '@/hooks/redux'
+import { useAppDispatch, useAppSelector } from '@/hooks/redux'
 import { useGetImportantQuery } from '@/features/order/orderApiSlice'
 import { useCheckPermission } from '@/features/auth/hooks/check'
 import { PlusIcon } from '@/components/Icons/PlusIcon'
@@ -13,7 +13,7 @@ import { UrgentIcon } from '@/components/Icons/UrgentIcon'
 import { OverdueIcon } from '@/components/Icons/OverdueIcon'
 import { ClockIcon } from '@/components/Icons/ClockIcon'
 import { Filters } from './Filters/Filters'
-import { setFilters } from '../tableSlice'
+import { getFilters, setFilters } from '../tableSlice'
 
 const status: IFilter = {
 	field: 'status',
@@ -26,6 +26,7 @@ export const Header = () => {
 	const { palette } = useTheme()
 	const navigate = useNavigate()
 
+	const filters = useAppSelector(getFilters)
 	const dispatch = useAppDispatch()
 
 	const { data } = useGetImportantQuery(null)
@@ -42,7 +43,9 @@ export const Header = () => {
 			compareType: 'eq',
 			value: 'true',
 		}
-		dispatch(setFilters([data, status]))
+
+		if (filters[0]?.field == 'urgent') dispatch(setFilters([]))
+		else dispatch(setFilters([data, status]))
 	}
 	const showOverdue = () => {
 		const data: IFilter = {
@@ -52,7 +55,8 @@ export const Header = () => {
 			value: dayjs().startOf('day').unix().toString(),
 		}
 
-		dispatch(setFilters([data, status]))
+		if (filters[0]?.field == 'dateOfDispatch') dispatch(setFilters([]))
+		else dispatch(setFilters([data, status]))
 	}
 	const showNearest = () => {
 		const data: IFilter = {
@@ -62,7 +66,8 @@ export const Header = () => {
 			value: dayjs().add(2, 'day').startOf('day').unix().toString(),
 		}
 
-		dispatch(setFilters([data, status]))
+		if (filters[0]?.field == 'dateOfDispatch') dispatch(setFilters([]))
+		else dispatch(setFilters([data, status]))
 	}
 
 	return (

@@ -103,15 +103,7 @@ export const OrderForm = () => {
 	]
 
 	return (
-		<Stack
-			mt={2}
-			mb={2}
-			pb={5}
-			spacing={2}
-			component={'form'}
-			position={'relative'}
-			onSubmit={handleSubmit(saveHandler)}
-		>
+		<Stack mt={2} mb={2} spacing={2} component={'form'} position={'relative'} onSubmit={handleSubmit(saveHandler)}>
 			<Stack>
 				<Typography fontSize={'1.4rem'} pl={0.5}>
 					Новый заказ

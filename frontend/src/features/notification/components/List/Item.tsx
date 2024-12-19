@@ -32,6 +32,7 @@ export const Item: FC<Props> = ({ data, isLast }) => {
 		<Stack sx={{ pb: 1, borderBottom: isLast ? 'none' : '1px solid #e0e0e0' }}>
 			{isLoading && <Fallback position={'absolute'} top={0} left={0} />}
 
+			{/* //TODO помечать приоритет уведомления */}
 			<Stack spacing={2} direction={'row'} justifyContent={'space-between'}>
 				<Typography variant='body2'>{dayjs(data.date * 1000).fromNow()}</Typography>
 
