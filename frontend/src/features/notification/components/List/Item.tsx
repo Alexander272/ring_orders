@@ -9,6 +9,7 @@ import type { INotification } from '../../types/notification'
 import { Fallback } from '@/components/Fallback/Fallback'
 import { TimesIcon } from '@/components/Icons/TimesIcon'
 import { useDeleteNotificationMutation } from '../../notificationApiSlice'
+import { WarningIcon } from '@/components/Icons/WarningIcon'
 
 type Props = {
 	data: INotification
@@ -42,13 +43,18 @@ export const Item: FC<Props> = ({ data, isLast }) => {
 			</Stack>
 			<Link to={data.link} style={{ textDecoration: 'none' }}>
 				<Typography
-					color='textPrimary'
+					color={data.priority == 0 ? 'error' : 'textPrimary'}
 					fontWeight={'bold'}
 					sx={{
+						display: 'flex',
+						alignItems: 'center',
 						transition: 'all 0.3s ease-in-out',
 						':hover': { color: 'primary.main' },
 					}}
 				>
+					{data.priority < 3 && (
+						<WarningIcon fill={data.priority == 2 ? '#9c9c09' : '#d71818'} fontSize={20} mr={1} />
+					)}
 					{data.title}
 				</Typography>
 			</Link>

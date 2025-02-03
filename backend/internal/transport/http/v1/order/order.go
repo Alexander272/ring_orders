@@ -37,11 +37,11 @@ func Register(api *gin.RouterGroup, service services.Order, middleware *middlewa
 			read.GET("/:id", handler.getById)
 			read.GET("/numbers", handler.getNumbers)
 			read.GET("/important", handler.getImportant)
+			read.PUT("/:id", handler.update)
 		}
 		write := order.Group("", middleware.CheckPermissions(constants.Orders, constants.Write))
 		{
 			write.POST("", handler.create)
-			write.PUT("/:id", handler.update)
 			write.DELETE("/:id", handler.delete)
 		}
 	}
