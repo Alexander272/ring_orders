@@ -12,10 +12,12 @@ export const MadeDialog = () => {
 		dispatch(changeDialogIsOpen({ variant: 'Made', isOpen: false }))
 	}
 
+	const content = modal?.content as { id: string; isDefect?: boolean }
+
 	return (
 		<Dialog
 			title={'Записать изготовление'}
-			body={<MadeForm orderId={(modal?.content as string) || ''} />}
+			body={<MadeForm orderId={content?.id || ''} isDefected={content?.isDefect || false} />}
 			open={modal?.isOpen || false}
 			onClose={closeHandler}
 			maxWidth='md'

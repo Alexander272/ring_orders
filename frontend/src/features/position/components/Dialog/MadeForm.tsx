@@ -18,9 +18,10 @@ import { useCreateMadeMutation } from '../../madeApiSlice'
 
 type Props = {
 	orderId: string
+	isDefected: boolean
 }
 
-export const MadeForm: FC<Props> = ({ orderId }) => {
+export const MadeForm: FC<Props> = ({ orderId, isDefected }) => {
 	const selected = useAppSelector(getSelected)
 	const positions = Object.values(selected).sort((a, b) => (a.count < b.count ? -1 : 1))
 
@@ -49,7 +50,7 @@ export const MadeForm: FC<Props> = ({ orderId }) => {
 
 		if (!positions.length && data) {
 			newRows = data.data
-				.filter(d => !d.isDone && !d.isDeleted)
+				.filter(d => (isDefected ? d.isDone : !d.isDone) && !d.isDeleted)
 				.map(p => ({
 					positionId: p.id,
 					count: p.count,
@@ -81,12 +82,12 @@ export const MadeForm: FC<Props> = ({ orderId }) => {
 
 	const saveHandler = async () => {
 		try {
-			const newRows = rows.filter(r => r.amount)
+			const newRows = rows.filter(r => r.amount && r.amount > 0)
 			if (!newRows.length) {
 				cancelHandler()
 				return
 			}
-			if (newRows.some(r => (r.remainder || 0) < (r.amount || 0))) {
+			if (!isDefected && newRows.some(r => (r.remainder || 0) < (r.amount || 0))) {
 				toast.error('Количество которое было изготовлено не может превышать остаток')
 				return
 			}

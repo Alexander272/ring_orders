@@ -138,7 +138,7 @@ export const Edit: FC<Props> = ({ id }) => {
 
 				<Breadcrumbs aria-label='breadcrumb'>
 					<Breadcrumb to={AppRoutes.Home}>Главная</Breadcrumb>
-					<Breadcrumb to={AppRoutes.Order.replace(':id', id)}>Заказ №{data.data.count}</Breadcrumb>
+					<Breadcrumb to={AppRoutes.Order.replace(':id', id)}>Заказ&nbsp;№{data.data.count}</Breadcrumb>
 					<Breadcrumb to={AppRoutes.EditOrder} active>
 						Редактирование
 					</Breadcrumb>

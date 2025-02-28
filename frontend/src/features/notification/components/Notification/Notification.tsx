@@ -60,16 +60,16 @@ export const Notification = () => {
 				{isLoading && <Fallback position={'absolute'} top={0} left={0} />}
 
 				{data?.total ? (
-					<>
-						{/* //TODO сделать фильтр по приоритету */}
-						<List />
-						<Stack mr={2} pt={0.5} borderTop={'1px solid #e0e0e0'}>
+					//TODO сделать фильтр по приоритету
+					[
+						<List key='list' />,
+						<Stack key='button' mr={2} pt={0.5} borderTop={'1px solid #e0e0e0'}>
 							<Button onClick={deleteHandler} color='inherit' sx={{ textTransform: 'inherit' }}>
 								<TimesIcon fontSize={12} mr={1} />
 								Удалить все
 							</Button>
-						</Stack>
-					</>
+						</Stack>,
+					]
 				) : (
 					<Stack alignItems={'center'} mt={3} mb={3}>
 						<BellOutlineIcon fontSize={40} fill={palette.text.secondary} mb={1} />

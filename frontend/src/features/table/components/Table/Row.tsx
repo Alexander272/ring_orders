@@ -1,15 +1,14 @@
 import { CSSProperties, FC } from 'react'
 import { Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import dayjs from 'dayjs'
 
 import type { IOrder } from '@/features/order/types/order'
+import { AppRoutes } from '@/constants/routes'
 import { TableRow } from '@/components/Table/TableRow'
 import { TableCell } from '@/components/Table/TableCell'
 import { CellText } from '@/components/CellText/CellText'
 import { Columns } from '../../constants/columns'
-import { AppRoutes } from '@/constants/routes'
-import dayjs from 'dayjs'
-// import { setContextMenu } from '../../tableSlice'
 
 type Props = {
 	data: IOrder
@@ -18,22 +17,6 @@ type Props = {
 
 export const Row: FC<Props> = ({ data, sx }) => {
 	const navigate = useNavigate()
-	// const dispatch = useAppDispatch()
-
-	// const { palette } = useTheme()
-
-	// const selectHandler = () => {
-	// 	dispatch(setSelected(data.id))
-	// }
-
-	// const contextHandler = (event: MouseEvent<HTMLDivElement>) => {
-	// 	event.preventDefault()
-	// 	const menu = {
-	// 		active: data.id,
-	// 		coords: { mouseX: event.clientX + 2, mouseY: event.clientY - 6 },
-	// 	}
-	// 	dispatch(setContextMenu(menu))
-	// }
 
 	const selectHandler = () => {
 		navigate(AppRoutes.Order.replace(':id', data.id))
@@ -54,19 +37,8 @@ export const Row: FC<Props> = ({ data, sx }) => {
 	if (data.status == 'closed') background = '#e9e9e9ab'
 
 	return (
-		<TableRow
-			onClick={selectHandler}
-			// onContext={contextHandler}
-			hover
-			sx={{
-				...sx,
-				// padding: '0 6px',
-				background: background,
-			}}
-		>
+		<TableRow onClick={selectHandler} hover sx={{ ...sx, background: background }}>
 			{Columns.map(c => {
-				// if (hidden[c.key]) return null
-
 				let value = data[c.key as keyof IOrder]?.toString() || '-'
 				if (c.formatter) value = c.formatter(data[c.key as keyof IOrder])
 

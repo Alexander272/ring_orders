@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { AppBar, Stack, Toolbar } from '@mui/material'
 
 import logo from '@/assets/logo.webp'
@@ -8,7 +9,6 @@ import { useSignOutMutation } from '@/features/auth/authApiSlice'
 import { getToken } from '@/features/user/userSlice'
 import { Notification } from '@/features/notification/components/Notification/NotificationLazy'
 import { ImageLink, NavButton } from './header.style'
-import { Suspense } from 'react'
 
 export const LayoutHeader = () => {
 	const [signOut] = useSignOutMutation()
@@ -35,12 +35,6 @@ export const LayoutHeader = () => {
 						<Suspense>
 							<Notification />
 						</Suspense>
-
-						{/* <NavLink to='/'>Главная</NavLink> */}
-
-						{/* {CheckPermission({ section: 'criterions', method: 'WRITE' }) && (
-						<NavLink to={'criterions'}>Критерии</NavLink>
-					)} */}
 
 						<NavButton onClick={signOutHandler}>Выйти</NavButton>
 					</Stack>

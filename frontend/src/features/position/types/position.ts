@@ -6,10 +6,12 @@ export interface IPosition {
 	amount: number
 	made: number
 	accepted: number
+	sent: number
 	// status: string
 	isDeleted?: boolean
 	isDone?: boolean
 	isAccepted?: boolean
+	isSent?: boolean
 	// unit: string
 }
 
@@ -21,6 +23,7 @@ export interface IEditPositionDTO {
 	amount: number | null
 	made: number | null
 	accepted: number | null
+	sent: number | null
 	isDeleted?: boolean
 }
 

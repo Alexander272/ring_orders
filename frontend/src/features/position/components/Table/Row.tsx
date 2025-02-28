@@ -26,21 +26,9 @@ export const Row: FC<Props> = ({ data, sx }) => {
 		dispatch(setSelected(data))
 	}
 
-	// const contextHandler = (event: MouseEvent<HTMLDivElement>) => {
-	// 	event.preventDefault()
-	// 	const menu = {
-	// 		active: data.id,
-	// 		coords: { mouseX: event.clientX + 2, mouseY: event.clientY - 6 },
-	// 	}
-	// 	dispatch(setContextMenu(menu))
-	// }
-
 	let styles = {}
-	if (canAccept ? data.isAccepted : data.isDone) {
-		styles = {
-			// backgroundColor: '#ebebeba1',
-			color: '#787878',
-		}
+	if (canAccept ? data.isAccepted : data.isDone && data.isSent) {
+		styles = { color: '#787878' }
 	}
 	if (data.isDeleted) {
 		styles = {
@@ -60,17 +48,9 @@ export const Row: FC<Props> = ({ data, sx }) => {
 		styles = { background: '#dde6fd' }
 	}
 
-	// let background = ''
-	// if (data.isDone) background = '#e5e5e5a1'
-	// if (selected[data.id]) background = '#dde6fd'
-	// let background = data.itemStyle?.background
-	// if (selected[data.id]) background = palette.rowActive.light
-	// if (contextMenu?.active == data.id) background = palette.rowActive.main
-
 	return (
 		<TableRow
 			onClick={selectHandler}
-			// onContext={contextHandler}
 			hover
 			sx={{
 				...sx,

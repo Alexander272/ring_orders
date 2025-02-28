@@ -6,34 +6,40 @@ export const Columns: IColumn[] = [
 	{
 		key: 'count',
 		label: Titles.Count,
-		width: 80,
+		width: 60,
 	},
 	{
 		key: 'name',
 		label: Titles.Name,
-		width: 340,
+		width: 310,
 	},
 	{
 		key: 'comment',
 		label: Titles.Comment,
-		width: 340,
+		width: 300,
 	},
 	{
 		key: 'amount',
 		label: Titles.Amount,
-		width: 170,
+		width: 150,
 		formatter: value => numberFormat(value as number),
 	},
 	{
 		key: 'made',
 		label: Titles.Done,
-		width: 170,
+		width: 150,
+		formatter: value => numberFormat(value as number),
+	},
+	{
+		key: 'sent',
+		label: Titles.Sent,
+		width: 150,
 		formatter: value => numberFormat(value as number),
 	},
 	{
 		key: 'accepted',
 		label: Titles.Accepted,
-		width: 170,
+		width: 150,
 		formatter: value => numberFormat(value as number),
 	},
 ]
