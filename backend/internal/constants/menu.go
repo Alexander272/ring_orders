@@ -5,6 +5,7 @@ const (
 	Positions = "positions"
 	Made      = "made"
 	Accept    = "accept"
+	Sent      = "sent"
 )
 
 const (

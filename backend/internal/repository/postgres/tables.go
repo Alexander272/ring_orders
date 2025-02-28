@@ -9,5 +9,6 @@ const (
 	PositionsTable     = "public.positions"
 	MadeTable          = "public.made"
 	AcceptedTable      = "public.accepted"
+	SentTable          = "public.sent"
 	NotificationsTable = "public.notifications"
 )

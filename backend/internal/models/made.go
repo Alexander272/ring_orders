@@ -23,7 +23,7 @@ type MadeDTO struct {
 	Id         string `json:"id" db:"id"`
 	PositionId string `json:"positionId" db:"position_id" binding:"required"`
 	Date       int    `json:"date" db:"date"`
-	Amount     int    `json:"amount" db:"amount" binding:"required"`
+	Amount     int    `json:"amount" db:"amount" binding:"required,gt=0"`
 	Note       string `json:"note" db:"note"`
 }
 

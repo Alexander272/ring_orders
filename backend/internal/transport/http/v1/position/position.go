@@ -10,6 +10,7 @@ import (
 	"github.com/Alexander272/ring_orders/backend/internal/transport/http/middleware"
 	"github.com/Alexander272/ring_orders/backend/internal/transport/http/v1/position/accepted"
 	"github.com/Alexander272/ring_orders/backend/internal/transport/http/v1/position/made"
+	"github.com/Alexander272/ring_orders/backend/internal/transport/http/v1/position/sent"
 	"github.com/Alexander272/ring_orders/backend/pkg/error_bot"
 	"github.com/gin-gonic/gin"
 )
@@ -35,6 +36,7 @@ func Register(api *gin.RouterGroup, service *services.Services, middleware *midd
 
 	made.Register(positions, service.Made, middleware)
 	accepted.Register(positions, service.Accepted, middleware)
+	sent.Register(positions, service.Sent, middleware)
 }
 
 func (h *Handler) get(c *gin.Context) {

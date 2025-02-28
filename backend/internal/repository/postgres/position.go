@@ -35,17 +35,19 @@ func (r *PositionRepo) Get(ctx context.Context, req *models.GetPositionDTO) ([]*
 			sort = "is_accepted,"
 		}
 		if req.Sort == "isDone" {
-			sort = "is_done,"
+			sort = "is_done,is_sent,"
 		}
 	}
 
 	query := fmt.Sprintf(`SELECT id, count, name, note, amount, is_deleted, updated_at, created_at,
-		COALESCE(sum_made, 0) AS made, COALESCE(sum_acc, 0) AS accepted, amount=COALESCE(sum_made, 0) as is_done, amount=COALESCE(sum_acc, 0) as is_accepted
+		COALESCE(sum_made, 0) AS made, COALESCE(sum_acc, 0) AS accepted, COALESCE(sum_sent, 0) AS sent, amount<=COALESCE(sum_made, 0) as is_done, 
+		COALESCE(sum_made, 0)=COALESCE(sum_sent, 0) as is_sent, amount<=COALESCE(sum_acc, 0) as is_accepted
 		FROM %s 
 		LEFT JOIN LATERAL (SELECT SUM(amount) AS sum_made FROM %s WHERE position_id=positions.id) AS made ON true
 		LEFT JOIN LATERAL (SELECT SUM(amount) AS sum_acc FROM %s WHERE position_id=positions.id) AS accepted ON true
+		LEFT JOIN LATERAL (SELECT SUM(quantity) AS sum_sent FROM %s WHERE position_id=positions.id) AS sent ON true
 		WHERE order_id=$1 ORDER BY is_deleted, %s count`,
-		PositionsTable, MadeTable, AcceptedTable, sort,
+		PositionsTable, MadeTable, AcceptedTable, SentTable, sort,
 	)
 	data := []*models.Position{}
 

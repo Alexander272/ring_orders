@@ -27,6 +27,9 @@ type Made interface {
 type Accepted interface {
 	postgres.Accepted
 }
+type Sent interface {
+	postgres.Sent
+}
 
 type Notification interface {
 	postgres.Notification
@@ -41,6 +44,7 @@ type Repository struct {
 	Position
 	Made
 	Accepted
+	Sent
 
 	Notification
 }
@@ -55,6 +59,7 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Position: postgres.NewPositionRepo(db),
 		Made:     postgres.NewMadeRepo(db),
 		Accepted: postgres.NewAcceptedRepo(db),
+		Sent:     postgres.NewSentRepo(db),
 
 		Notification: postgres.NewNotificationRepo(db),
 	}

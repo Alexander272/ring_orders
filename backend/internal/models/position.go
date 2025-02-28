@@ -11,9 +11,11 @@ type Position struct {
 	Amount     int       `json:"amount" db:"amount"`
 	Made       int       `json:"made" db:"made"`
 	Accepted   int       `json:"accepted" db:"accepted"`
+	Sent       int       `json:"sent" db:"sent"`
 	IsDeleted  bool      `json:"isDeleted" db:"is_deleted"`
 	IsDone     bool      `json:"isDone" db:"is_done"`
 	IsAccepted bool      `json:"isAccepted" db:"is_accepted"`
+	IsSent     bool      `json:"isSent" db:"is_sent"`
 	UpdatedAt  time.Time `json:"updatedAt" db:"updated_at"`
 	CreatedAt  time.Time `json:"createdAt" db:"created_at"`
 }
