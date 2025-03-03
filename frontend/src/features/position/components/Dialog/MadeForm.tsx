@@ -55,7 +55,7 @@ export const MadeForm: FC<Props> = ({ orderId, isDefected }) => {
 					positionId: p.id,
 					count: p.count,
 					name: p.name,
-					remainder: p.amount - p.made,
+					remainder: isDefected ? p.amount - p.accepted : p.amount - p.made,
 					amount: null,
 				}))
 		}

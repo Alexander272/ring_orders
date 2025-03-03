@@ -38,6 +38,7 @@ export const OrderData: FC<Props> = ({ id }) => {
 
 	const isDone = positions?.data.every(p => p.isDone || p.isDeleted)
 	const isAccepted = positions?.data.every(p => p.isAccepted || p.isDeleted)
+	const isSent = positions?.data.every(p => p.isSent || p.isDeleted)
 
 	if (isFetching) return <Fallback />
 	if (!data) return null
@@ -47,7 +48,7 @@ export const OrderData: FC<Props> = ({ id }) => {
 
 			<Stack direction={'row'} justifyContent={'space-between'} alignItems={'flex-end'} paddingX={1}>
 				<Info data={data} />
-				<Buttons data={data} isDone={isDone} isAccepted={isAccepted} />
+				<Buttons data={data} isDone={isDone} isAccepted={isAccepted} isSent={isSent} />
 			</Stack>
 
 			<PositionTable orderId={id} />

@@ -19,10 +19,11 @@ import { useUpdateOrderMutation } from '../../orderApiSlice'
 type Props = {
 	data: IOrder
 	isDone?: boolean
+	isSent?: boolean
 	isAccepted?: boolean
 }
 
-export const Buttons: FC<Props> = ({ data, isDone, isAccepted }) => {
+export const Buttons: FC<Props> = ({ data, isDone, isSent, isAccepted }) => {
 	const { palette } = useTheme()
 	const [open, setOpen] = useState(false)
 	const anchor = useRef<HTMLDivElement>(null)
@@ -147,7 +148,7 @@ export const Buttons: FC<Props> = ({ data, isDone, isAccepted }) => {
 							<br />
 							(Взамен брака)
 						</MenuItem>
-						<MenuItem onClick={openHandler('Sent')} sx={{ pl: '38px' }}>
+						<MenuItem disabled={isSent} onClick={openHandler('Sent')} sx={{ pl: '38px' }}>
 							Отправление
 						</MenuItem>
 						{canAccepted && (
