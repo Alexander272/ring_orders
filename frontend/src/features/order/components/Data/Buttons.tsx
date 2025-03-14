@@ -101,14 +101,18 @@ export const Buttons: FC<Props> = ({ data, isDone, isSent, isAccepted }) => {
 					<ButtonGroup ref={anchor}>
 						<Button
 							onClick={openDefaultHandler}
-							disabled={isDone}
+							disabled={(canMade && isDone) || (canAccepted && isAccepted)}
 							variant='outlined'
 							sx={{ width: 200, padding: '6px 12px', textTransform: 'inherit' }}
 						>
 							<PlusIcon
 								fontSize={12}
 								mr={1}
-								fill={isDone ? palette.action.disabled : palette.primary.main}
+								fill={
+									(canMade && isDone) || (canAccepted && isAccepted)
+										? palette.action.disabled
+										: palette.primary.main
+								}
 							/>
 							Добавить
 						</Button>
