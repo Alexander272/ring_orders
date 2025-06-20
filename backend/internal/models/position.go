@@ -25,6 +25,10 @@ type GetPositionDTO struct {
 	Sort    string `json:"sort"`
 }
 
+type GetPositionByIdDTO struct {
+	Id string `json:"id" db:"id"`
+}
+
 type CreatePositionDTO struct {
 	Id      string `json:"id" db:"id"`
 	OrderId string `json:"orderId" db:"order_id"`

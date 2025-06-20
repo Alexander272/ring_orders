@@ -1,6 +1,7 @@
 package position
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/Alexander272/ring_orders/backend/internal/constants"
@@ -13,6 +14,7 @@ import (
 	"github.com/Alexander272/ring_orders/backend/internal/transport/http/v1/position/sent"
 	"github.com/Alexander272/ring_orders/backend/pkg/error_bot"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type Handler struct {
@@ -30,7 +32,11 @@ func Register(api *gin.RouterGroup, service *services.Services, middleware *midd
 
 	positions := api.Group("/positions", middleware.VerifyToken)
 	{
-		positions.GET("", middleware.CheckPermissions(constants.Positions, constants.Read), handler.get)
+		read := positions.Group("", middleware.CheckPermissions(constants.Positions, constants.Read))
+		{
+			read.GET("", handler.get)
+			read.GET("/:id", handler.getById)
+		}
 		positions.PUT("/several", middleware.CheckPermissions(constants.Positions, constants.Write), handler.update)
 	}
 
@@ -55,6 +61,26 @@ func (h *Handler) get(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response.DataResponse{Data: data, Total: len(data)})
+}
+
+func (h *Handler) getById(c *gin.Context) {
+	id := c.Param("id")
+	if err := uuid.Validate(id); err != nil {
+		response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Id не корректен")
+		return
+	}
+	req := &models.GetPositionByIdDTO{Id: id}
+
+	data, err := h.service.GetById(c, req)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRows) {
+			response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Позиция с таком Id не найдена")
+			return
+		}
+		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, response.DataResponse{Data: data})
 }
 
 func (h *Handler) update(c *gin.Context) {

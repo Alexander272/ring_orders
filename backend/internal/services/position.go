@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/Alexander272/ring_orders/backend/internal/models"
@@ -20,6 +21,7 @@ func NewPositionService(repo repository.Position) *PositionService {
 
 type Position interface {
 	Get(ctx context.Context, req *models.GetPositionDTO) ([]*models.Position, error)
+	GetById(ctx context.Context, req *models.GetPositionByIdDTO) (*models.Position, error)
 	Create(ctx context.Context, dto *models.CreatePositionDTO) error
 	CreateSeveral(ctx context.Context, dto []*models.CreatePositionDTO) error
 	Update(ctx context.Context, dto *models.UpdatePositionDTO) error
@@ -30,6 +32,17 @@ func (s *PositionService) Get(ctx context.Context, req *models.GetPositionDTO) (
 	data, err := s.repo.Get(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get positions. error: %w", err)
+	}
+	return data, nil
+}
+
+func (s *PositionService) GetById(ctx context.Context, req *models.GetPositionByIdDTO) (*models.Position, error) {
+	data, err := s.repo.GetById(ctx, req)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRows) {
+			return nil, err
+		}
+		return nil, fmt.Errorf("failed to get position by id. error: %w", err)
 	}
 	return data, nil
 }

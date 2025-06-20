@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -22,6 +24,7 @@ func NewPositionRepo(db *sqlx.DB) *PositionRepo {
 
 type Position interface {
 	Get(ctx context.Context, req *models.GetPositionDTO) ([]*models.Position, error)
+	GetById(ctx context.Context, req *models.GetPositionByIdDTO) (*models.Position, error)
 	Create(ctx context.Context, dto *models.CreatePositionDTO) error
 	CreateSeveral(ctx context.Context, dto []*models.CreatePositionDTO) error
 	Update(ctx context.Context, dto *models.UpdatePositionDTO) error
@@ -52,6 +55,19 @@ func (r *PositionRepo) Get(ctx context.Context, req *models.GetPositionDTO) ([]*
 	data := []*models.Position{}
 
 	if err := r.db.SelectContext(ctx, &data, query, req.OrderId); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return data, nil
+}
+
+func (r *PositionRepo) GetById(ctx context.Context, req *models.GetPositionByIdDTO) (*models.Position, error) {
+	query := fmt.Sprintf(`SELECT id, count, name, note, amount FROM %s WHERE id=$1`, PositionsTable)
+	data := &models.Position{}
+
+	if err := r.db.GetContext(ctx, data, query, req.Id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, models.ErrNoRows
+		}
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return data, nil
