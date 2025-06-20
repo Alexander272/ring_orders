@@ -10,8 +10,9 @@ export const acceptApiSlice = apiSlice.injectEndpoints({
 	endpoints: builder => ({
 		getAccept: builder.query<{ data: IAccept[]; total: number }, string>({
 			query: id => ({
-				url: `${API.positions.accept}/${id}`,
+				url: API.positions.accept,
 				method: 'GET',
+				params: new URLSearchParams({ position: id }),
 			}),
 			providesTags: [{ type: 'Accepted', id: 'ALL' }],
 			onQueryStarted: async (_arg, api) => {

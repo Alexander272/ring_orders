@@ -25,6 +25,25 @@ export const positionApiSlice = apiSlice.injectEndpoints({
 			},
 			providesTags: [{ type: 'Positions', id: 'ALL' }],
 		}),
+		getPositionById: builder.query<{ data: IPosition }, string>({
+			query: id => ({
+				url: `${API.positions.base}/${id}`,
+				method: 'GET',
+			}),
+			onQueryStarted: async (_arg, api) => {
+				try {
+					await api.queryFulfilled
+				} catch (error) {
+					console.log(error)
+					const fetchError = (error as IBaseFetchError).error
+					toast.error(fetchError.data.message, { autoClose: false })
+				}
+			},
+			providesTags: (_res, _err, req) => [
+				{ type: 'Positions', id: 'ID' },
+				{ type: 'Positions', id: req },
+			],
+		}),
 
 		updatePositions: builder.mutation<null, IPosition[]>({
 			query: data => ({
@@ -32,9 +51,12 @@ export const positionApiSlice = apiSlice.injectEndpoints({
 				method: 'PUT',
 				body: data,
 			}),
-			invalidatesTags: [{ type: 'Positions', id: 'ALL' }],
+			invalidatesTags: [
+				{ type: 'Positions', id: 'ALL' },
+				{ type: 'Positions', id: 'ID' },
+			],
 		}),
 	}),
 })
 
-export const { useGetPositionsQuery, useUpdatePositionsMutation } = positionApiSlice
+export const { useGetPositionsQuery, useGetPositionByIdQuery, useUpdatePositionsMutation } = positionApiSlice

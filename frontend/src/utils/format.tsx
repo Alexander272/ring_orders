@@ -19,6 +19,16 @@ export const formatNumber = (num: number | undefined): string | JSX.Element => {
 
 export const numberFormat = new Intl.NumberFormat('ru-Ru').format
 
+export const dataFormat = new Intl.DateTimeFormat('ru-Ru', {
+	weekday: 'long',
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	hour: 'numeric',
+	minute: 'numeric',
+	second: 'numeric',
+}).format
+
 export const removeSpace = (values: string[]) => {
 	return values.map(v => v.replace(/\s+/g, ''))
 }

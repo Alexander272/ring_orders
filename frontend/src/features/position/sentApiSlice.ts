@@ -10,8 +10,9 @@ export const sentApiSlice = apiSlice.injectEndpoints({
 	endpoints: builder => ({
 		getSent: builder.query<{ data: ISent[]; total: number }, string>({
 			query: id => ({
-				url: `${API.positions.sent}/${id}`,
+				url: API.positions.sent,
 				method: 'GET',
+				params: new URLSearchParams({ position: id }),
 			}),
 			providesTags: [{ type: 'Sent', id: 'ALL' }],
 			onQueryStarted: async (_arg, api) => {

@@ -1,4 +1,4 @@
-import { CSSProperties, FC } from 'react'
+import { CSSProperties, FC, MouseEvent } from 'react'
 
 import type { IPosition } from '@/features/position/types/position'
 import { PermRules } from '@/constants/permissions'
@@ -8,7 +8,7 @@ import { TableRow } from '@/components/Table/TableRow'
 import { TableCell } from '@/components/Table/TableCell'
 import { CellText } from '@/components/CellText/CellText'
 import { Columns } from '../../constants/columns'
-import { getSelected, setSelected } from '../../positionSlice'
+import { getContextMenu, getSelected, setContextMenu, setSelected } from '../../positionSlice'
 
 type Props = {
 	data: IPosition
@@ -17,6 +17,7 @@ type Props = {
 
 export const Row: FC<Props> = ({ data, sx }) => {
 	const selected = useAppSelector(getSelected)
+	const contextMenu = useAppSelector(getContextMenu)
 	const dispatch = useAppDispatch()
 
 	const canAccept = useCheckPermission(PermRules.Accept.Write)
@@ -24,6 +25,15 @@ export const Row: FC<Props> = ({ data, sx }) => {
 	const selectHandler = () => {
 		if (data.isDeleted || (canAccept ? data.isAccepted : data.isDone)) return
 		dispatch(setSelected(data))
+	}
+
+	const contextHandler = (event: MouseEvent<HTMLDivElement>) => {
+		event.preventDefault()
+		const menu = {
+			active: data.id,
+			coords: { mouseX: event.clientX + 2, mouseY: event.clientY - 6 },
+		}
+		dispatch(setContextMenu(menu))
 	}
 
 	let styles = {}
@@ -47,10 +57,12 @@ export const Row: FC<Props> = ({ data, sx }) => {
 	if (selected[data.id]) {
 		styles = { background: '#dde6fd' }
 	}
+	if (contextMenu?.active == data.id) styles = { background: '#c6d6ff' }
 
 	return (
 		<TableRow
 			onClick={selectHandler}
+			onContext={contextHandler}
 			hover
 			sx={{
 				...sx,

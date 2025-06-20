@@ -10,8 +10,9 @@ export const madeApiSlice = apiSlice.injectEndpoints({
 	endpoints: builder => ({
 		getMade: builder.query<{ data: IMade[]; total: number }, string>({
 			query: id => ({
-				url: `${API.positions.made}/${id}`,
+				url: API.positions.made,
 				method: 'GET',
+				params: new URLSearchParams({ position: id }),
 			}),
 			providesTags: [{ type: 'Made', id: 'ALL' }],
 			onQueryStarted: async (_arg, api) => {
