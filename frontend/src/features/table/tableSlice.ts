@@ -40,6 +40,7 @@ const tableSlice = createSlice({
 		setSort: (state, action: PayloadAction<string>) => {
 			if (!state.sort[action.payload]) {
 				state.sort = { ...(state.sort || {}), [action.payload]: 'ASC' }
+				localStorage.setItem(localKeys.sort, JSON.stringify(state.sort))
 				return
 			}
 
