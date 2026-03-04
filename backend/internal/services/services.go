@@ -15,6 +15,7 @@ type Services struct {
 	Permission
 
 	Notification
+	Statistics
 
 	Order
 	Position
@@ -38,6 +39,7 @@ func NewServices(deps *Deps) *Services {
 	permission := NewPermissionService("configs/privacy.conf", menu, role)
 
 	notification := NewNotificationService(deps.Repos.Notification, deps.Keycloak)
+	statistics := NewStatisticsService(deps.Repos.Statistics)
 
 	made := NewMadeService(deps.Repos.Made)
 	accepted := NewAcceptedService(deps.Repos.Accepted)
@@ -53,6 +55,7 @@ func NewServices(deps *Deps) *Services {
 		Permission: permission,
 
 		Notification: notification,
+		Statistics:   statistics,
 
 		Order:    order,
 		Position: position,

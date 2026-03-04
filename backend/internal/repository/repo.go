@@ -34,6 +34,9 @@ type Sent interface {
 type Notification interface {
 	postgres.Notification
 }
+type Statistics interface {
+	postgres.Statistics
+}
 
 type Repository struct {
 	Role
@@ -47,6 +50,7 @@ type Repository struct {
 	Sent
 
 	Notification
+	Statistics
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -62,5 +66,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Sent:     postgres.NewSentRepo(db),
 
 		Notification: postgres.NewNotificationRepo(db),
+		Statistics:   postgres.NewStatisticsRepo(db),
 	}
 }
