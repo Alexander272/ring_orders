@@ -19,4 +19,7 @@ export const API = {
 	notifications: {
 		base: `notifications` as const,
 	},
+	statistics: {
+		base: `statistics` as const,
+	},
 }

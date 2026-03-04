@@ -4,4 +4,5 @@ export const AppRoutes = {
 	NewOrder: '/order/new' as const,
 	Order: '/order/:id' as const,
 	EditOrder: '/order/edit/:id' as const,
+	Statistics: '/statistics' as const,
 }

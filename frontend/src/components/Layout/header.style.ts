@@ -45,6 +45,7 @@ export const NavButton = muiStyled('p')(({ theme }) => ({
 	alignItems: 'center',
 	justifyContent: 'center',
 	position: 'relative',
+	margin: 0,
 
 	'&:after': {
 		content: '""',
