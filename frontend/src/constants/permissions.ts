@@ -11,6 +11,10 @@ export const PermRules = Object.freeze({
 		Read: 'accept:read' as const,
 		Write: 'accept:write' as const,
 	},
+	Reject: {
+		Read: 'reject:read' as const,
+		Write: 'reject:write' as const,
+	},
 	Statistics: {
 		Read: 'statistics:read' as const,
 	},

@@ -18,7 +18,7 @@ export const AcceptDialog = () => {
 			body={<AcceptForm orderId={(modal?.content as { id: string })?.id || ''} />}
 			open={modal?.isOpen || false}
 			onClose={closeHandler}
-			maxWidth='md'
+			maxWidth='lg'
 			fullWidth
 		/>
 	)

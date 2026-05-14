@@ -21,25 +21,31 @@ export const Columns: IColumn[] = [
 	{
 		key: 'amount',
 		label: Titles.Amount,
-		width: 150,
+		width: 120,
 		formatter: value => numberFormat(value as number),
 	},
 	{
 		key: 'made',
 		label: Titles.Done,
-		width: 150,
+		width: 120,
 		formatter: value => numberFormat(value as number),
 	},
 	{
 		key: 'sent',
 		label: Titles.Sent,
-		width: 150,
+		width: 120,
 		formatter: value => numberFormat(value as number),
 	},
 	{
 		key: 'accepted',
 		label: Titles.Accepted,
-		width: 150,
+		width: 120,
+		formatter: value => numberFormat(value as number),
+	},
+	{
+		key: 'rejected',
+		label: Titles.Rejected,
+		width: 120,
 		formatter: value => numberFormat(value as number),
 	},
 ]

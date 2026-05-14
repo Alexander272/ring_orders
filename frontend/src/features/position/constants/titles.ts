@@ -6,4 +6,5 @@ export const Titles = Object.freeze({
 	Done: 'Выполнено' as const,
 	Sent: 'Отправлено' as const,
 	Accepted: 'Принято' as const,
+	Rejected: 'Брак' as const,
 })

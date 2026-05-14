@@ -6,8 +6,9 @@ import { Tab } from '@/components/Tabs/Tab'
 import { Made } from './Made'
 import { Sent } from './Sent'
 import { Accept } from './Accept'
+import { Reject } from './Reject'
 
-type Tab = 'made' | 'sent' | 'accept'
+type Tab = 'made' | 'sent' | 'accept' | 'reject'
 
 export const History: FC<{ rowId: string }> = ({ rowId }) => {
 	const [tab, setTab] = useState<Tab>('made')
@@ -22,11 +23,13 @@ export const History: FC<{ rowId: string }> = ({ rowId }) => {
 				<Tab label='Изготовлено' value='made' />
 				<Tab label='Отправлено' value='sent' />
 				<Tab label='Принято' value='accept' />
+				<Tab label='Брак' value='reject' />
 			</Tabs>
 
 			{tab == 'made' && <Made id={rowId} />}
 			{tab == 'sent' && <Sent id={rowId} />}
 			{tab == 'accept' && <Accept id={rowId} />}
+			{tab == 'reject' && <Reject id={rowId} />}
 		</Stack>
 	)
 }

@@ -13,4 +13,6 @@ export interface IAcceptDTO {
 	name: string | null
 	remainder: number | null
 	amount: number | null
+	rejectAmount: number | null
+	rejectNote: string | null
 }

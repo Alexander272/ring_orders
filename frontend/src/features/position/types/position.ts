@@ -6,6 +6,7 @@ export interface IPosition {
 	amount: number
 	made: number
 	accepted: number
+	rejected: number
 	sent: number
 	// status: string
 	isDeleted?: boolean

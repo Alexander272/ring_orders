@@ -6,6 +6,7 @@ import dayjs from 'dayjs'
 
 import type { IFetchError } from '@/app/types/error'
 import type { IAccept, IAcceptDTO } from '../../types/accept'
+import type { IReject } from '../../types/reject'
 import { PermRules } from '@/constants/permissions'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
 import { removeSpace } from '@/utils/format'
@@ -15,6 +16,7 @@ import { TopFallback } from '@/components/Fallback/TopFallback'
 import { getSelected, setSelected } from '../../positionSlice'
 import { useGetPositionsQuery } from '../../positionApiSlice'
 import { useCreateAcceptMutation } from '../../acceptApiSlice'
+import { useCreateRejectMutation } from '../../rejectApiSlice'
 
 type Props = {
 	orderId: string
@@ -28,22 +30,27 @@ export const AcceptForm: FC<Props> = ({ orderId }) => {
 
 	const { data, isFetching } = useGetPositionsQuery(
 		{ orderId, sort: canAccept ? 'isAccepted' : 'isDone' },
-		{ skip: !orderId }
+		{ skip: !orderId },
 	)
 
 	const [rows, setRows] = useState<IAcceptDTO[]>([])
 
-	const [create, { isLoading }] = useCreateAcceptMutation()
+	const [createAccept, { isLoading: isAcceptLoading }] = useCreateAcceptMutation()
+	const [createReject, { isLoading: isRejectLoading }] = useCreateRejectMutation()
 
 	const dispatch = useAppDispatch()
+
+	const isLoading = isAcceptLoading || isRejectLoading
 
 	useEffect(() => {
 		let newRows = positions.map(p => ({
 			positionId: p.id,
 			count: p.count,
 			name: p.name,
-			remainder: Math.min(p.sent, p.amount) - p.accepted,
+			remainder: Math.min(p.sent, p.amount) - p.accepted - p.rejected,
 			amount: null,
+			rejectAmount: null,
+			rejectNote: '',
 		}))
 
 		if (!positions.length && data) {
@@ -53,8 +60,10 @@ export const AcceptForm: FC<Props> = ({ orderId }) => {
 					positionId: p.id,
 					count: p.count,
 					name: p.name,
-					remainder: Math.min(p.sent, p.amount) - p.accepted,
+					remainder: Math.min(p.sent, p.amount) - p.accepted - p.rejected,
 					amount: null,
+					rejectAmount: null,
+					rejectNote: '',
 				}))
 		}
 
@@ -68,13 +77,23 @@ export const AcceptForm: FC<Props> = ({ orderId }) => {
 			...keyColumn<IAcceptDTO, 'remainder'>('remainder', intColumn),
 			title: 'Осталось',
 			disabled: true,
-			width: 0.5,
+			width: 0.4,
 		},
 		{
 			...keyColumn<IAcceptDTO, 'amount'>('amount', intColumn),
 			title: 'Принято',
-			width: 0.5,
+			width: 0.4,
 			prePasteValues: removeSpace,
+		},
+		{
+			...keyColumn<IAcceptDTO, 'rejectAmount'>('rejectAmount', intColumn),
+			title: 'Брак',
+			width: 0.4,
+			prePasteValues: removeSpace,
+		},
+		{
+			...keyColumn<IAcceptDTO, 'rejectNote'>('rejectNote', textColumn),
+			title: 'Примечание',
 		},
 	]
 
@@ -85,24 +104,39 @@ export const AcceptForm: FC<Props> = ({ orderId }) => {
 
 	const saveHandler = async () => {
 		try {
-			const newRows = rows.filter(r => r.amount && r.amount > 0)
-			if (!newRows.length) {
+			const acceptRows = rows.filter(r => r.amount && r.amount > 0)
+			const rejectRows = rows.filter(r => r.rejectAmount && r.rejectAmount > 0)
+
+			if (!acceptRows.length && !rejectRows.length) {
 				cancelHandler()
 				return
 			}
-			if (newRows.some(r => (r.remainder || 0) < (r.amount || 0))) {
-				toast.error('Количество которое было принято не может превышать остаток')
+			if (rows.some(r => (r.remainder || 0) < (r.amount || 0) + (r.rejectAmount || 0))) {
+				toast.error('Сумма принятого и брака не может превышать остаток')
 				return
 			}
 
-			const dto: IAccept[] = newRows.map(r => ({
-				id: r.positionId,
-				positionId: r.positionId,
-				date: dayjs().unix(),
-				amount: r.amount || 0,
-			}))
+			if (acceptRows.length) {
+				const acceptDTO: IAccept[] = acceptRows.map(r => ({
+					id: r.positionId,
+					positionId: r.positionId,
+					date: dayjs().unix(),
+					amount: r.amount || 0,
+				}))
+				await createAccept(acceptDTO).unwrap()
+			}
 
-			await create(dto).unwrap()
+			if (rejectRows.length) {
+				const rejectDTO: IReject[] = rejectRows.map(r => ({
+					id: r.positionId,
+					positionId: r.positionId,
+					date: dayjs().unix(),
+					amount: r.rejectAmount || 0,
+					note: r.rejectNote || '',
+				}))
+				await createReject(rejectDTO).unwrap()
+			}
+
 			toast.success('Данные успешно сохранены')
 			cancelHandler()
 		} catch (error) {
