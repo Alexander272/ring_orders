@@ -21,6 +21,7 @@ type Services struct {
 	Position
 	Made
 	Accepted
+	Reject
 	Sent
 }
 
@@ -43,6 +44,7 @@ func NewServices(deps *Deps) *Services {
 
 	made := NewMadeService(deps.Repos.Made)
 	accepted := NewAcceptedService(deps.Repos.Accepted)
+	reject := NewRejectService(deps.Repos.Reject)
 	sent := NewSentService(deps.Repos.Sent)
 	position := NewPositionService(deps.Repos.Position)
 	order := NewOrderService(deps.Repos.Order, position, notification)
@@ -61,6 +63,7 @@ func NewServices(deps *Deps) *Services {
 		Position: position,
 		Made:     made,
 		Accepted: accepted,
+		Reject:   reject,
 		Sent:     sent,
 	}
 }

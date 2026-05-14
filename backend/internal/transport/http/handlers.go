@@ -1,7 +1,9 @@
 package http
 
 import (
+	"io/fs"
 	"net/http"
+	"strings"
 
 	"github.com/Alexander272/ring_orders/backend/internal/config"
 	"github.com/Alexander272/ring_orders/backend/internal/services"
@@ -9,6 +11,7 @@ import (
 	http_v1 "github.com/Alexander272/ring_orders/backend/internal/transport/http/v1"
 	"github.com/Alexander272/ring_orders/backend/pkg/auth"
 	"github.com/Alexander272/ring_orders/backend/pkg/limiter"
+	"github.com/Alexander272/ring_orders/backend/web"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,12 +34,8 @@ func (h *Handler) Init(conf *config.Config) *gin.Engine {
 		limiter.Limit(conf.Limiter.RPS, conf.Limiter.Burst, conf.Limiter.TTL),
 	)
 
-	// Init router
-	router.GET("/api/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong")
-	})
-
 	h.initAPI(router, conf)
+	h.initStatic(router)
 
 	return router
 }
@@ -49,4 +48,33 @@ func (h *Handler) initAPI(router *gin.Engine, conf *config.Config) {
 	{
 		handlerV1.Init(api)
 	}
+
+	router.GET("/api/ping", func(c *gin.Context) {
+		c.String(http.StatusOK, "pong")
+	})
+}
+
+func (h *Handler) initStatic(router *gin.Engine) {
+	subFS, err := fs.Sub(web.Frontend, "frontend")
+	if err != nil {
+		return
+	}
+
+	router.NoRoute(func(c *gin.Context) {
+		path := c.Request.URL.Path
+
+		if strings.HasPrefix(path, "/api") {
+			c.Status(http.StatusNotFound)
+			return
+		}
+
+		filePath := strings.TrimPrefix(path, "/")
+		if f, err := subFS.Open(filePath); err == nil {
+			f.Close()
+			c.FileFromFS(filePath, http.FS(subFS))
+			return
+		}
+
+		c.FileFromFS("index.html", http.FS(subFS))
+	})
 }

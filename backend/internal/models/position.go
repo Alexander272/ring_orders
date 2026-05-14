@@ -11,6 +11,7 @@ type Position struct {
 	Amount     int       `json:"amount" db:"amount"`
 	Made       int       `json:"made" db:"made"`
 	Accepted   int       `json:"accepted" db:"accepted"`
+	Rejected   int       `json:"rejected" db:"rejected"`
 	Sent       int       `json:"sent" db:"sent"`
 	IsDeleted  bool      `json:"isDeleted" db:"is_deleted"`
 	IsDone     bool      `json:"isDone" db:"is_done"`

@@ -2,3 +2,5 @@ goose -dir internal/migrate/db/migrations postgres "postgresql://postgres:postgr
 goose -dir internal/migrate/db/migrations create new_accepted_table sql
 scp -r ./dist administrator@pro:/home/administrator/apps/rings
 npx vite-bundle-visualizer
+
+docker build -f backend/Dockerfile -t ring-orders .
