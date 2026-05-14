@@ -91,7 +91,7 @@ func (s *SessionService) DecodeAccessToken(ctx context.Context, token string) (*
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode access token. error: %w", err)
 	}
-	service := os.Getenv("SERVICE_NAME")
+	service := os.Getenv("SERVICE_ID")
 
 	user := &models.User{}
 	var role, username, userId string

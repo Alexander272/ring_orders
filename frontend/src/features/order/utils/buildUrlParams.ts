@@ -8,7 +8,6 @@ export const buildSiUrlParams = (req: IParams): URLSearchParams => {
 	if (req.size && req.size != Size) params.push(['size', req.size.toString()])
 
 	if (req.sort && Object.keys(req.sort).length) {
-		console.log(req.sort)
 		const sort: string[] = []
 		Object.keys(req.sort).forEach(k => {
 			sort.push(`${req.sort![k] == 'DESC' ? '-' : ''}${k}`)
