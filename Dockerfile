@@ -35,5 +35,5 @@ COPY --from=builder /build/main /bin/main
 
 # Безопасность и документация
 USER appuser
-EXPOSE 8080
+EXPOSE 9000
 ENTRYPOINT ["/bin/main"]

@@ -37,11 +37,20 @@ func NewHandler(services *services.Services, keycloak *auth.KeycloakClient) *Han
 }
 
 func (h *Handler) Init(conf *config.Config) *gin.Engine {
-	router := gin.Default()
+	router := gin.New()
 	router.RedirectTrailingSlash = false
 	router.RedirectFixedPath = false
 
 	router.Use(
+		gin.LoggerWithConfig(gin.LoggerConfig{
+			Skip: func(c *gin.Context) bool {
+				path := c.Request.URL.Path
+				if strings.HasPrefix(path, "/api") {
+					return false
+				}
+				return c.Writer.Status() < http.StatusBadRequest
+			},
+		}),
 		gin.CustomRecovery(h.ErrorHandler),
 		securityHeaders(),
 	)
@@ -84,9 +93,7 @@ func (h *Handler) initAPI(router *gin.Engine, conf *config.Config) {
 
 	api := router.Group("/api")
 	api.Use(limiter.Limit(conf.Limiter.RPS, conf.Limiter.Burst, conf.Limiter.TTL))
-	{
-		handlerV1.Init(api)
-	}
+	handlerV1.Init(api)
 
 	router.GET("/api/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
@@ -172,7 +179,7 @@ func negotiateEncoding(header string) string {
 	}
 
 	type pref struct {
-		name  string
+		name    string
 		quality float64
 	}
 	var prefs []pref
